@@ -43,6 +43,10 @@ public class TableConfirmationActivity extends AppCompatActivity implements Even
         Button button = (Button) findViewById(R.id.done);
         Intent intent = getIntent();
         final String date  = intent.getStringExtra(Constants.EVENTDATE);
+
+        final String tableNumber  = intent.getStringExtra(Constants.TABLE_NUMBER);
+        final String tableId  = intent.getStringExtra(Constants.TABLE_ID);
+        final String tableType  = intent.getStringExtra(Constants.TABLE_TYPE);
         final String cost = intent.getStringExtra(Constants.COST);
         final String size = intent.getStringExtra(Constants.TABLE_SIZE);
         final String details = intent.getStringExtra(Constants.DETAILS);
@@ -78,7 +82,8 @@ public class TableConfirmationActivity extends AppCompatActivity implements Even
         TextView sizetv =  (TextView) findViewById(R.id.guestCountValue);
         sizetv.setText(size);
         TextView detailstv =  (TextView) findViewById(R.id.detailsValue);
-        detailstv.setText(details);
+        final String detailsx = tableType+", Table No. "+tableNumber+"; "+details;
+        detailstv.setText(detailsx);
 
         TextView bookingAmttv =  (TextView) findViewById(R.id.bookingAmountValue);
 
@@ -117,7 +122,7 @@ public class TableConfirmationActivity extends AppCompatActivity implements Even
                 intent.putExtra(Constants.EVENTDATE, date);
                 intent.putExtra(Constants.COST, Integer.toString(fullAmount));
                 intent.putExtra(Constants.REMAINING_AMOUNT, Integer.toString(restAmount));
-                intent.putExtra(Constants.DETAILS, details);
+                intent.putExtra(Constants.DETAILS, detailsx);
                 intent.putExtra(Constants.TABLE_SIZE, size);
                 long time= System.currentTimeMillis();
                 final String qrNumber = Long.toString(time);
@@ -144,7 +149,7 @@ public class TableConfirmationActivity extends AppCompatActivity implements Even
                     JSONObject ticketBookingDetails = new JSONObject();
                     ticketBookingDetails.put("action", "inserOrderDetails");
                     ticketBookingDetails.put(Constants.TICKETTYPE, "table");
-                    ticketBookingDetails.put(Constants.TICKET_DETAILS, tableDetails);
+                    ticketBookingDetails.put(Constants.TICKET_DETAILS, detailsx);
                     ticketBookingDetails.put(Constants.EVENTDATE, date);
                     ticketBookingDetails.put(Constants.CLUB_ID, clubId);
                     ticketBookingDetails.put(Constants.CLUB_NAME, clubName);
@@ -159,6 +164,7 @@ public class TableConfirmationActivity extends AppCompatActivity implements Even
                     ticketBookingDetails.put(Constants.PAID_AMOUNT, Integer.toString(paidAmount));
                     ticketBookingDetails.put(Constants.REMAINING_AMOUNT, Integer.toString(restAmount));
                     ticketBookingDetails.put(Constants.DISCOUNT, tableDiscount);
+                    ticketBookingDetails.put(Constants.TABLE_ID, tableId);
 
 
 

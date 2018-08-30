@@ -57,6 +57,13 @@
 
 
 
+
+        <activity
+            android:name="com.application.club.guestlist.bookingTable.TableSelectionWebClientActivity"
+            android:label="@string/app_name"></activity>
+
+
+
         <activity
             android:name="com.application.club.guestlist.profile.ProfileScreen"
             android:label="@string/app_name"></activity>

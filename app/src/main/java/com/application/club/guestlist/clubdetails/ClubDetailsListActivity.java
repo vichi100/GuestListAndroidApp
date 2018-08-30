@@ -32,6 +32,7 @@ public class ClubDetailsListActivity extends AppCompatActivity implements EventL
 	boolean getData = false;
 	static JSONArray clubsEventListJsonArray;
 	static JSONArray ticketDetailsListJsonArray;
+	static JSONArray tableDetailsListJsonArray;
 
 	private ArrayList<ClubEventsDetailsItem> clubEventDetailsItemList;
     private ArrayList<TicketDetailsItem> ticketDetailsItemList;
@@ -165,6 +166,7 @@ public class ClubDetailsListActivity extends AppCompatActivity implements EventL
 		ClubsDetailListAdapter adapter = new ClubsDetailListAdapter(this, clubEventDetailsItemList);
 
         adapter.setTicketDetailsListJsonArray(ticketDetailsListJsonArray);
+		adapter.setTableDetailsListJsonArray(tableDetailsListJsonArray);
 
         Constants.setTicketDetailsItemList(ticketDetailsItemList);
 		// Attach the adapter to a ListView
@@ -180,6 +182,7 @@ public class ClubDetailsListActivity extends AppCompatActivity implements EventL
 				JSONObject eventJObjX = new JSONObject(message);
 				clubsEventListJsonArray = eventJObjX.getJSONArray("eventsDetailList");
 				ticketDetailsListJsonArray = eventJObjX.getJSONArray("ticketDetailsList");
+				tableDetailsListJsonArray = eventJObjX.getJSONArray("tableDetailsList");
 
 
 			}catch (Exception ex){

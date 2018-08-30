@@ -91,9 +91,20 @@ public class UtillMethods {
         //TimeZone tz = TimeZone.getTimeZone("Asia/Kolkata");
 
         //TimeZone tz = TimeZone.getTimeZone("GMT+05:30");
-        DateFormat dateFormat = new SimpleDateFormat("dd/MMM/yyyy");
-        Date date = new Date();
-        return date;
+        Date datex = null;
+        try {
+            DateFormat dateFormat = new SimpleDateFormat("dd/MMM/yyyy");
+            Date date = new Date();
+
+            dateFormat.format(date);
+
+            datex = dateFormat.parse(dateFormat.format(date));
+
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+        return datex;
 
     }
 

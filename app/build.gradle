@@ -9,8 +9,8 @@ android {
         applicationId "com.application.club.guestlist"
         minSdkVersion 15
         targetSdkVersion 27
-        versionCode 15
-        versionName "15.0"
+        versionCode 16
+        versionName "16.0"
     }
     buildTypes {
         release {
@@ -43,6 +43,7 @@ dependencies {
     compile 'com.danikula:videocache:2.7.0'
     compile 'com.jakewharton:butterknife:8.8.1'
     compile 'com.github.bumptech.glide:glide:3.5.2'
+    compile 'cn.weidongjian.android:popupWindowHelper:0.5'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     compile 'com.github.deano2390:MaterialShowcaseView:1.2.0'
     compile 'com.github.florent37:tutoshowcase:1.0.1'

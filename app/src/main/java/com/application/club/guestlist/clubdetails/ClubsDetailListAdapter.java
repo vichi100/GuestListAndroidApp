@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.application.club.guestlist.bookingTable.TableSelectionWebClientActivity;
 import com.squareup.picasso.Picasso;
 import com.application.club.guestlist.R;
 import com.application.club.guestlist.booking.BookGuestListActivity;
@@ -33,6 +34,7 @@ public class ClubsDetailListAdapter extends ArrayAdapter<ClubEventsDetailsItem> 
 
 
     private JSONArray ticketDetailsListJsonArray;
+    private JSONArray  tableDetailsListJsonArray;
 
     public ClubsDetailListAdapter(Context context, ArrayList<ClubEventsDetailsItem> clubEventsDetailsItems) {
         super(context, 0, clubEventsDetailsItems);
@@ -79,20 +81,35 @@ public class ClubsDetailListAdapter extends ArrayAdapter<ClubEventsDetailsItem> 
 
          Date eventdateAsDate = UtillMethods.stringToDate(eventdate);
          Date todayDate = UtillMethods.getTodayDateAsDate();
-
-
-         if(todayDate.getYear() >= eventdateAsDate.getYear() && todayDate.getMonth()>= eventdateAsDate.getMonth() && todayDate.getDate()<=eventdateAsDate.getDate() ){
+         int x = eventdateAsDate.compareTo(todayDate);
+         if(x >= 1 || x == 0){
              convertView.setAlpha((float) 1.0);
              table.setEnabled(true);
              pass.setEnabled(true);
              guestList.setEnabled(true);
-         }else{
+         }else if(x <= -1){
              convertView.setAlpha((float) 0.5);
              convertView.setBackgroundColor(Color.GRAY);
              table.setEnabled(false);
              pass.setEnabled(false);
              guestList.setEnabled(false);
          }
+
+         //if(todayDate.getYear() >= eventdateAsDate.getYear() && todayDate.getMonth()>= eventdateAsDate.getMonth() && todayDate.getDate()<=eventdateAsDate.getDate() ){
+//         if(eventdateAsDate.getYear() >= todayDate.getYear() && eventdateAsDate.getMonth()>= todayDate.getMonth()
+//                 && eventdateAsDate.getDate()>=todayDate.getDate() ){
+//
+//                 convertView.setAlpha((float) 1.0);
+//             table.setEnabled(true);
+//             pass.setEnabled(true);
+//             guestList.setEnabled(true);
+//         }else{
+//             convertView.setAlpha((float) 0.5);
+//             convertView.setBackgroundColor(Color.GRAY);
+//             table.setEnabled(false);
+//             pass.setEnabled(false);
+//             guestList.setEnabled(false);
+//         }
 
 
          guestList.setOnClickListener(new OnClickListener() {
@@ -127,12 +144,12 @@ public class ClubsDetailListAdapter extends ArrayAdapter<ClubEventsDetailsItem> 
          table.setOnClickListener(new OnClickListener() {
              @Override
              public void onClick(View v) {
-                 Intent intent = new Intent(mContext, TableBookingActivity.class);
+                 Intent intent = new Intent(mContext, TableSelectionWebClientActivity.class);
                  intent.putExtra(Constants.CLUB_ID, clubId);
                  intent.putExtra(Constants.CLUB_NAME, clubName);
                  intent.putExtra(Constants.EVENTDATE, eventdate);
                  intent.putExtra(Constants.IMAGE_URL, imgURL);
-                 intent.putExtra(Constants.TICKET_DETAILS, ticketDetailsListJsonArray.toString());
+                 intent.putExtra(Constants.TICKET_DETAILS, tableDetailsListJsonArray.toString());
                  mContext.startActivity(intent);
 
              }
@@ -150,5 +167,14 @@ public class ClubsDetailListAdapter extends ArrayAdapter<ClubEventsDetailsItem> 
 
     public void setTicketDetailsListJsonArray(JSONArray ticketDetailsListJsonArray) {
         this.ticketDetailsListJsonArray = ticketDetailsListJsonArray;
+    }
+
+
+    public JSONArray getTableDetailsListJsonArray() {
+        return tableDetailsListJsonArray;
+    }
+
+    public void setTableDetailsListJsonArray(JSONArray tableDetailsListJsonArray) {
+        this.tableDetailsListJsonArray = tableDetailsListJsonArray;
     }
 }
