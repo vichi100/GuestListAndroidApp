@@ -1,3 +1,17 @@
+start java server:
+
+nohup java -jar /root/home/guestlistserver.jar &
+
+start video server :
+
+nohup node /root/home/videostream/servervideo.js &
+
+Start image server:
+
+nohup node /root/home/guestlistnodeserver.js &
+
+############
+
 paypal
 vichi100@gmail.com
 meriMaa29071979#
@@ -92,6 +106,55 @@ Bye
 Stopping mysqld:                                           [  OK  ]
 Starting mysqld:                                           [  OK  ]
 [root@tipsy ~]#
+
+
+###### mysql local mac ####
+user: root
+pw :   vichi123
+
+
+port: 3306
+
+vichis-MacBook-Air:~ root# apachectl restart
+
+sudo su -
+export PATH=/usr/local/mysql/bin:$PATH
+mysql -u root -p
+
+location usr/local/mysql
+
+sudo su -
+
+
+
+
+appache dir :
+
+/Library/WebServer/Documents/imagemap
+
+sudo vim /etc/apache2/httpd.conf
+# DocumentRoot: The directory out of which you will serve your
+# documents. By default, all requests are taken from this directory, but
+# symbolic links and aliases may be used to point to other locations.
+#
+DocumentRoot "/Library/WebServer/Documents"
+<Directory "/Library/WebServer/Documents">
+    #...
+</Directory>
+
+
+
+scp root@199.180.133.121:/var/www/guestlist/imagemap/layoutimage /Users/vichi/
+
+scp root@199.180.133.121:/root/easyadnetwork/EasyAdNetwork-Complete/* /Users/vichi/EasyAdNetwork
+
+cp: /root/easyadnetwork/EasyAdNetwork-Complete/customer-wise-pix: not a regular file
+vichis-MacBook-Air:~ root# scp -r root@199.180.133.121:/root/easyadnetwork/EasyAdNetwork-Complete/* /Users/vichi/EasyAdNetwork
+root@199.180.133.121's password:
+.DS_Store                                                                                                                                                               100% 6148    14.4KB/s   00:00
+new  30 - Copy.html
+
+
 
 
 #### Tables SQL ####
@@ -448,3 +511,11 @@ update offers set date = '23/Jul/2018' and starttime =  '23/Jul/2018 12:00:00' a
 update offers set date = '23/Jul/2018' and starttime =  '23/Jul/2018 12:00:00' and  timetoexpire = '27/Jul/2018 20:00:00' where clubid = '100009'
 
 update offers set date = '23/Jul/2018' where clubid = '100009';
+
+
+update ticketdetails set date = '10/Sep/2018' where date='20/Aug/2018';
+update ticketdetails set date = '11/Sep/2018' where date='21/Aug/2018';
+update ticketdetails set date = '12/Sep/2018' where date='22/Aug/2018';
+update ticketdetails set date = '13/Sep/2018' where date='23/Aug/2018';
+update ticketdetails set date = '14/Sep/2018' where date='24/Aug/2018';
+update ticketdetails set date = '15/Sep/2018' where date='25/Aug/2018';

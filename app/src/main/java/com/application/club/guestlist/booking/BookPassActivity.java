@@ -248,8 +248,8 @@ public class BookPassActivity extends AppCompatActivity implements QuantityView.
                     //String todayDate = UtillMethods.getTodayDate();
                     //ticketBookingDetails.put(Constants.BOOKINGDATE, todayDate);
 
-                    BuyFromPaytm buyFromPaytm = new BuyFromPaytm(BookPassActivity.this);
-                    buyFromPaytm.generateCheckSum(Integer.toString(totalCost), qrNumber, customerId);
+//                    BuyFromPaytm buyFromPaytm = new BuyFromPaytm(BookPassActivity.this);
+//                    buyFromPaytm.generateCheckSum(Integer.toString(totalCost), qrNumber, customerId);
 
                     socketOperator.sendMessage(ticketBookingDetails);
 

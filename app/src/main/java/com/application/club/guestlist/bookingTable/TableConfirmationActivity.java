@@ -82,7 +82,7 @@ public class TableConfirmationActivity extends AppCompatActivity implements Even
         TextView sizetv =  (TextView) findViewById(R.id.guestCountValue);
         sizetv.setText(size);
         TextView detailstv =  (TextView) findViewById(R.id.detailsValue);
-        final String detailsx = tableType+", Table No. "+tableNumber+"; "+details;
+        final String detailsx = tableType+", Table No. "+tableNumber+" \n"+details;
         detailstv.setText(detailsx);
 
         TextView bookingAmttv =  (TextView) findViewById(R.id.bookingAmountValue);
@@ -122,7 +122,8 @@ public class TableConfirmationActivity extends AppCompatActivity implements Even
                 intent.putExtra(Constants.EVENTDATE, date);
                 intent.putExtra(Constants.COST, Integer.toString(fullAmount));
                 intent.putExtra(Constants.REMAINING_AMOUNT, Integer.toString(restAmount));
-                intent.putExtra(Constants.DETAILS, detailsx);
+                String allDetails = tableType+", Table No. "+tableNumber+" for "+size+" guest ; "+details;//// VIP, Table No 15 for 12 guest
+                intent.putExtra(Constants.DETAILS, allDetails);
                 intent.putExtra(Constants.TABLE_SIZE, size);
                 long time= System.currentTimeMillis();
                 final String qrNumber = Long.toString(time);
@@ -169,8 +170,8 @@ public class TableConfirmationActivity extends AppCompatActivity implements Even
 
 
 
-                    BuyFromPaytm buyFromPaytm = new BuyFromPaytm(TableConfirmationActivity.this);
-                    buyFromPaytm.generateCheckSum(Integer.toString(costIntx), qrNumber, customerId);
+//                    BuyFromPaytm buyFromPaytm = new BuyFromPaytm(TableConfirmationActivity.this);
+//                    buyFromPaytm.generateCheckSum(Integer.toString(costIntx), qrNumber, customerId);
 
 
 

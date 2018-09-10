@@ -378,6 +378,12 @@ public class ClubsListFragment extends Fragment implements   SearchView.OnQueryT
         adapter.notifyDataSetChanged();
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (listFeed.getHandingVideoHolder() != null) listFeed.getHandingVideoHolder().stopVideo();
+    }
+
 //    public void filter(String text) {
 //        items.clear();
 //        if(text.isEmpty()){
@@ -435,6 +441,8 @@ public class ClubsListFragment extends Fragment implements   SearchView.OnQueryT
         mGoogleApiClient.disconnect();
         super.onStop();
     }
+
+
 
     @Override
     public void onLocationChanged(Location location) {

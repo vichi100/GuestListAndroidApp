@@ -26,7 +26,7 @@ public class SocketOperator {
 	 
 	//private static String socketURL = "http://192.168.0.102:3080/";// macbook address  http://192.168.0.100:3080/
 	//private static String socketURL = "http://198.167.140.169:3080/";// viprus unix box address
-	private static String socketURL = "http://192.168.43.64:3080/";
+	private static String socketURL = "http://199.180.133.121:3080/";//"http://192.168.0.9:3080/";//"http://199.180.133.121:3080/";
 
 
 

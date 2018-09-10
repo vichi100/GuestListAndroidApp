@@ -37,6 +37,7 @@ import java.util.Map;
 import static com.application.club.guestlist.utils.Constants.BOOKING_TYPE;
 import static com.application.club.guestlist.utils.Constants.CLUB_ID;
 import static com.application.club.guestlist.utils.Constants.CLUB_NAME;
+import static com.application.club.guestlist.utils.Constants.DETAILS;
 import static com.application.club.guestlist.utils.Constants.EVENTDATE;
 import static com.application.club.guestlist.utils.Constants.QRNUMBER;
 import static com.application.club.guestlist.utils.Constants.REMAINING_AMOUNT;
@@ -74,6 +75,7 @@ public class QRCodeActivity extends AppCompatActivity {
         final String qrNumber  = intent.getStringExtra(QRNUMBER);
         String qrNumberStr = UtillMethods.splitString(qrNumber);
         final String remainingAmt  = intent.getStringExtra(REMAINING_AMOUNT);
+        final String allDetails = intent.getStringExtra(DETAILS);
 
         String quantityViewDefaultstag = null;
         String quantityViewDefaultCouple = null;
@@ -152,7 +154,7 @@ public class QRCodeActivity extends AppCompatActivity {
             final String size = intent.getStringExtra(Constants.TABLE_SIZE);
             final String details = intent.getStringExtra(Constants.DETAILS);
             String entry = "Table For "+size+ " with full cover of Rs"+cost;
-            entrytv.setText(entry);
+            entrytv.setText(allDetails);
 
             remainingAmtTv.setText("Rs "+remainingAmt+" Need to Pay At Club");
 
@@ -163,7 +165,7 @@ public class QRCodeActivity extends AppCompatActivity {
 
         imgResult   = (ImageView)findViewById(R.id.imgResult);
 
-        self.generateImage(qrNumber);
+        self.generateImage(qrNumber,eventdate, clubName);
 
 
         // Locate the button in activity_main.xml
@@ -301,7 +303,7 @@ public class QRCodeActivity extends AppCompatActivity {
     }
 
 
-    private void generateImage(final String qrNumber){
+    private void generateImage(final String qrNumber, final String eventdate, final String clubName){
         long time= System.currentTimeMillis();
 
         final String text = Long.toString(time);
@@ -327,7 +329,8 @@ public class QRCodeActivity extends AppCompatActivity {
                 hintMap.put(EncodeHintType.MARGIN, 1);
                 QRCodeWriter qrCodeWriter = new QRCodeWriter();
                 try {
-                    BitMatrix byteMatrix = qrCodeWriter.encode(qrNumber, BarcodeFormat.QR_CODE, size,
+                    String QRImageCode = "Code: "+qrNumber+" | Club: "+clubName+" | Event Date: "+eventdate;
+                    BitMatrix byteMatrix = qrCodeWriter.encode(QRImageCode, BarcodeFormat.QR_CODE, size,
                             size, hintMap);
                     int height = byteMatrix.getHeight();
                     int width = byteMatrix.getWidth();

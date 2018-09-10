@@ -67,6 +67,7 @@ public class ClubsListAdapter extends BaseAdapter<Feed> {
 
 
 
+
 	@Override
 	public int getItemViewType(int position) {
 		if(list != null && list.size() > 0){
