@@ -57,4 +57,10 @@
         <item name="android:background">#909191</item>
     </style>
 
+    <style name="Custom" parent="android:Theme.DeviceDefault.Dialog">
+        <item name="DialogTitleText"></item>
+        <item name="DialogSpotColor">@android:color/holo_orange_dark</item>
+        <item name="DialogSpotCount">8</item>
+    </style>
+
 </resources>

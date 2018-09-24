@@ -519,3 +519,23 @@ update ticketdetails set date = '12/Sep/2018' where date='22/Aug/2018';
 update ticketdetails set date = '13/Sep/2018' where date='23/Aug/2018';
 update ticketdetails set date = '14/Sep/2018' where date='24/Aug/2018';
 update ticketdetails set date = '15/Sep/2018' where date='25/Aug/2018';
+
+
+update ticketdetails set date = '17/Sep/2018' where date='10/Sep/2018';
+update ticketdetails set date = '18/Sep/2018' where date='11/Sep/2018';
+update ticketdetails set date = '19/Sep/2018' where date='12/Sep/2018';
+update ticketdetails set date = '20/Sep/2018' where date='13/Sep/2018';
+update ticketdetails set date = '21/Sep/2018' where date='14/Sep/2018';
+update ticketdetails set date = '22/Sep/2018' where date='15/Sep/2018';
+
+
+update tablesdata set eventdate = '17/Sep/2018' where eventdate='10/Sep/2018';
+update tablesdata set eventdate = '18/Sep/2018' where eventdate='11/Sep/2018';
+update tablesdata set eventdate = '19/Sep/2018' where eventdate='12/Sep/2018';
+update tablesdata set eventdate = '20/Sep/2018' where eventdate='13/Sep/2018';
+update tablesdata set eventdate = '21/Sep/2018' where eventdate='14/Sep/2018';
+update tablesdata set eventdate = '22/Sep/2018' where eventdate='15/Sep/2018';
+update tablesdata set eventdate = '23/Sep/2018' where eventdate='16/Sep/2018';
+
+update tablesdata set booked = 'available';
+

@@ -1,14 +1,19 @@
 package com.application.club.guestlist.clubdetails;
+import android.app.AlertDialog;
+import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.application.club.guestlist.MainActivity;
 import com.github.florent37.tutoshowcase.TutoShowcase;
 import com.squareup.picasso.Picasso;
 import com.application.club.guestlist.R;
@@ -21,6 +26,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import dmax.dialog.SpotsDialog;
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 
 import static com.application.club.guestlist.utils.Constants.CLUB_ID;
@@ -44,11 +50,17 @@ public class ClubDetailsListActivity extends AppCompatActivity implements EventL
 
 	ListView clubListv;
 
+	private AlertDialog progressDialog;
+
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.club_details_activity_custom_list);
 		//getSupportActionBar().setTitle("Events");
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+		progressDialog= new SpotsDialog.Builder().setContext(this).setTheme(R.style.Custom).build();
+
+
 		clubListv = (ListView)findViewById(R.id.lvUsers);
 		Intent intent = getIntent();
         clubName = intent.getStringExtra(Constants.CLUB_NAME);
@@ -65,8 +77,16 @@ public class ClubDetailsListActivity extends AppCompatActivity implements EventL
 //		}
 
 
-		populateEventsListForClub();
+		//populateEventsListForClub();
        // displayTuto(); // one second delay
+
+		Handler handler = new Handler();
+		FetchData fdTask = new FetchData();
+		fdTask.execute();
+
+		TaskCanceler taskCanceler = new TaskCanceler(fdTask);
+
+		handler.postDelayed(taskCanceler, 60*1000);
 	}
 
 	private void populateEventsListForClub() {
@@ -162,16 +182,16 @@ public class ClubDetailsListActivity extends AppCompatActivity implements EventL
 			ex.printStackTrace();
 		}
 
-		// Create the adapter to convert the array to views
-		ClubsDetailListAdapter adapter = new ClubsDetailListAdapter(this, clubEventDetailsItemList);
-
-        adapter.setTicketDetailsListJsonArray(ticketDetailsListJsonArray);
-		adapter.setTableDetailsListJsonArray(tableDetailsListJsonArray);
-
-        Constants.setTicketDetailsItemList(ticketDetailsItemList);
-		// Attach the adapter to a ListView
-		ListView listView = (ListView) this.findViewById(R.id.lvUsers);
-		listView.setAdapter(adapter);
+//		// Create the adapter to convert the array to views
+//		ClubsDetailListAdapter adapter = new ClubsDetailListAdapter(this, clubEventDetailsItemList);
+//
+//        adapter.setTicketDetailsListJsonArray(ticketDetailsListJsonArray);
+//		adapter.setTableDetailsListJsonArray(tableDetailsListJsonArray);
+//
+//        Constants.setTicketDetailsItemList(ticketDetailsItemList);
+//		// Attach the adapter to a ListView
+//		ListView listView = (ListView) this.findViewById(R.id.lvUsers);
+//		listView.setAdapter(adapter);
 	}
 
 	public void eventReceived(String message){
@@ -232,5 +252,73 @@ public class ClubDetailsListActivity extends AppCompatActivity implements EventL
                 //.animated(true)
                 .show();
     }
+
+
+	private class FetchData extends AsyncTask<String, String, String> {
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			progressDialog.setCancelable(true);
+			progressDialog.show();
+		}
+
+		@Override
+		protected String doInBackground(String... f_url) {
+			try {
+				populateEventsListForClub();
+
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+
+
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(String file_url) {
+			progressDialog.dismiss();
+			// Create the adapter to convert the array to views
+			ClubsDetailListAdapter adapter = new ClubsDetailListAdapter(ClubDetailsListActivity.this, clubEventDetailsItemList);
+
+			adapter.setTicketDetailsListJsonArray(ticketDetailsListJsonArray);
+			adapter.setTableDetailsListJsonArray(tableDetailsListJsonArray);
+
+			Constants.setTicketDetailsItemList(ticketDetailsItemList);
+			// Attach the adapter to a ListView
+			ListView listView = (ListView) ClubDetailsListActivity.this.findViewById(R.id.lvUsers);
+			listView.setAdapter(adapter);
+
+
+		}
+	}
+
+
+	public class TaskCanceler implements Runnable{
+		private AsyncTask task;
+
+		public TaskCanceler(AsyncTask task) {
+			this.task = task;
+		}
+
+		@Override
+		public void run() {
+//            int count = 5;
+			if (task.getStatus() == AsyncTask.Status.RUNNING ){
+//                while(count>0){
+//                    Toast.makeText(getActivity(),
+//                        "Your Internet Connection Seems Slow, We Are Still Trying !!!",
+//                        Toast.LENGTH_LONG).show();
+//                    count--;
+//                    SystemClock.sleep(5*1000);
+//                }
+
+				//alert.show();
+				task.cancel(true);
+			}
+
+		}
+	}
 	
 }

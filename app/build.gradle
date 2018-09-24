@@ -9,8 +9,8 @@ android {
         applicationId "com.application.club.guestlist"
         minSdkVersion 15
         targetSdkVersion 27
-        versionCode 17
-        versionName "17.0"
+        versionCode 18
+        versionName "18.0"
     }
     buildTypes {
         release {
@@ -47,6 +47,7 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
     compile 'com.github.deano2390:MaterialShowcaseView:1.2.0'
     compile 'com.github.florent37:tutoshowcase:1.0.1'
+    implementation 'com.github.d-max:spots-dialog:1.1@aar'
 
 }
 
