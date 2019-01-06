@@ -260,7 +260,10 @@ public class ClubDetailsListActivity extends AppCompatActivity implements EventL
 		protected void onPreExecute() {
 			super.onPreExecute();
 			progressDialog.setCancelable(true);
-			progressDialog.show();
+			if(! ClubDetailsListActivity.this.isFinishing()){
+				progressDialog.show();
+			}
+
 		}
 
 		@Override
@@ -278,7 +281,10 @@ public class ClubDetailsListActivity extends AppCompatActivity implements EventL
 
 		@Override
 		protected void onPostExecute(String file_url) {
-			progressDialog.dismiss();
+			if(progressDialog != null && progressDialog.isShowing()){
+				progressDialog.dismiss();
+			}
+
 			// Create the adapter to convert the array to views
 			ClubsDetailListAdapter adapter = new ClubsDetailListAdapter(ClubDetailsListActivity.this, clubEventDetailsItemList);
 

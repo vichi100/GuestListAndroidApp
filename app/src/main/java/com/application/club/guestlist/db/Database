@@ -1,5 +1,17 @@
 start java server:
 
+
+matahari:
+
+sid_chhugani@yahoo.co.in
+9833630599: sidharth
+
+
+
+
+vaibhav.mehta02@gmail.com
+
+-------------
 nohup java -jar /root/home/guestlistserver.jar &
 
 start video server :
@@ -19,6 +31,17 @@ meriMaa29071979#
 
 emailid pw: meriMaa29071979@
 
+ST: 4585460006713409/732419570126
+
+
+
+vichitra29feb
+
+vichi29Feb1988
+
+
+vichi29Feb1988bsp
+
 
 4862 6989 0750 1647
 4862698907501647
@@ -29,6 +52,9 @@ st 04/2021
 
 to  create signed apk password is : vichi123
 
+
+########## payumoney #############
+teriMaaka124
 
 ########
 
@@ -529,13 +555,232 @@ update ticketdetails set date = '21/Sep/2018' where date='14/Sep/2018';
 update ticketdetails set date = '22/Sep/2018' where date='15/Sep/2018';
 
 
-update tablesdata set eventdate = '17/Sep/2018' where eventdate='10/Sep/2018';
-update tablesdata set eventdate = '18/Sep/2018' where eventdate='11/Sep/2018';
-update tablesdata set eventdate = '19/Sep/2018' where eventdate='12/Sep/2018';
-update tablesdata set eventdate = '20/Sep/2018' where eventdate='13/Sep/2018';
-update tablesdata set eventdate = '21/Sep/2018' where eventdate='14/Sep/2018';
-update tablesdata set eventdate = '22/Sep/2018' where eventdate='15/Sep/2018';
-update tablesdata set eventdate = '23/Sep/2018' where eventdate='16/Sep/2018';
+update tablesdata set eventdate = '24/Sep/2018' where eventdate='17/Sep/2018';
+update tablesdata set eventdate = '25/Sep/2018' where eventdate='18/Sep/2018';
+update tablesdata set eventdate = '26/Sep/2018' where eventdate='19/Sep/2018';
+update tablesdata set eventdate = '27/Sep/2018' where eventdate='20/Sep/2018';
+update tablesdata set eventdate = '28/Sep/2018' where eventdate='21/Sep/2018';
+update tablesdata set eventdate = '29/Sep/2018' where eventdate='22/Sep/2018';
+update tablesdata set eventdate = '30/Sep/2018' where eventdate='23/Sep/2018';
 
 update tablesdata set booked = 'available';
 
+
+update ticketdetails set date = '15/Oct/2018' where date='01/Oct/2018';
+update ticketdetails set date = '16/Oct/2018' where date='02/Oct/2018';
+update ticketdetails set date = '17/Oct/2018' where date='03/Oct/2018';
+update ticketdetails set date = '18/Oct/2018' where date='04/Oct/2018';
+update ticketdetails set date = '19/Oct/2018' where date='05/Oct/2018';
+update ticketdetails set date = '20/Oct/2018' where date='06/Oct/2018';
+update ticketdetails set date = '21/Oct/2018' where date='07/Oct/2018';
+
+
+update ticketdetails set date = '23/Oct/2018' where date='15/Oct/2018';
+update ticketdetails set date = '24/Oct/2018' where date='16/Oct/2018';
+update ticketdetails set date = '25/Oct/2018' where date='17/Oct/2018';
+update ticketdetails set date = '26/Oct/2018' where date='18/Oct/2018';
+update ticketdetails set date = '27/Oct/2018' where date='19/Oct/2018';
+update ticketdetails set date = '28/Oct/2018' where date='20/Oct/2018';
+update ticketdetails set date = '29/Oct/2018' where date='21/Oct/2018';
+
+
+update eventdetails set date = '30/Oct/2018' where date='23/Oct/2018';
+update eventdetails set date = '31/Oct/2018' where date='24/Oct/2018';
+update eventdetails set date = '01/Nov/2018' where date='25/Oct/2018';
+update eventdetails set date = '02/Nov/2018' where date='26/Oct/2018';
+update eventdetails set date = '03/Nov/2018' where date='27/Oct/2018';
+update eventdetails set date = '04/Nov/2018' where date='28/Oct/2018';
+update eventdetails set date = '05/Nov/2018' where date='29/Oct/2018';
+
+
+
+update eventdetails set date = '23/Oct/2018' where date='15/Oct/2018';
+update eventdetails set date = '24/Oct/2018' where date='16/Oct/2018';
+update eventdetails set date = '25/Oct/2018' where date='17/Oct/2018';
+update eventdetails set date = '26/Oct/2018' where date='18/Oct/2018';
+update eventdetails set date = '27/Oct/2018' where date='19/Oct/2018';
+update eventdetails set date = '28/Oct/2018' where date='20/Oct/2018';
+update eventdetails set date = '29/Oct/2018' where date='21/Oct/2018';
+
+
+update eventdetails set date = '23/Oct/2018' where date='15/Oct/2018';
+update eventdetails set date = '24/Oct/2018' where date='16/Oct/2018';
+update eventdetails set date = '25/Oct/2018' where date='17/Oct/2018';
+update eventdetails set date = '26/Oct/2018' where date='18/Oct/2018';
+update eventdetails set date = '27/Oct/2018' where date='19/Oct/2018';
+update eventdetails set date = '28/Oct/2018' where date='20/Oct/2018';
+update eventdetails set date = '29/Oct/2018' where date='21/Oct/2018';
+
+
+
+update tablesdata set eventdate = '30/Oct/2018' where eventdate='23/Oct/2018';
+update tablesdata set eventdate = '31/Oct/2018' where eventdate='24/Oct/2018';
+update tablesdata set eventdate = '01/Nov/2018' where eventdate='25/Oct/2018';
+update tablesdata set eventdate = '02/Nov/2018' where eventdate='26/Oct/2018';
+update tablesdata set eventdate = '03/Nov/2018' where eventdate='27/Oct/2018';
+update tablesdata set eventdate = '04/Nov/2018' where eventdate='28/Oct/2018';
+update tablesdata set eventdate = '05/Nov/2018' where eventdate='29/Oct/2018';
+
+
+
+update bookingdetails set eventdate = '23/Oct/2018' where eventdate='15/Oct/2018';
+update bookingdetails set eventdate = '24/Oct/2018' where eventdate='16/Oct/2018';
+update bookingdetails set eventdate = '25/Oct/2018' where eventdate='17/Oct/2018';
+update bookingdetails set eventdate = '26/Oct/2018' where eventdate='18/Oct/2018';
+update bookingdetails set eventdate = '27/Oct/2018' where eventdate='19/Oct/2018';
+update bookingdetails set eventdate = '28/Oct/2018' where eventdate='20/Oct/2018';
+update bookingdetails set eventdate = '29/Oct/2018' where eventdate='21/Oct/2018';
+
+
+update tablesdata set eventdate = '23/Oct/2018' where eventdate='15/Oct/2018';
+update tablesdata set eventdate = '24/Oct/2018' where eventdate='16/Oct/2018';
+update tablesdata set eventdate = '25/Oct/2018' where eventdate='17/Oct/2018';
+update tablesdata set eventdate = '26/Oct/2018' where eventdate='18/Oct/2018';
+update tablesdata set eventdate = '27/Oct/2018' where eventdate='19/Oct/2018';
+update tablesdata set eventdate = '28/Oct/2018' where eventdate='20/Oct/2018';
+update tablesdata set eventdate = '29/Oct/2018' where eventdate='21/Oct/2018';
+
+
+update tablesdata set date = '01/Oct/2018' where date='24/Sep/2018';
+update tablesdata set date = '02/Oct/2018' where date='25/Sep/2018';
+update tablesdata set date = '03/Oct/2018' where date='26/Sep/2018';
+update tablesdata set date = '04/Oct/2018' where date='27/Sep/2018';
+update tablesdata set date = '05/Oct/2018' where date='28/Sep/2018';
+update tablesdata set date = '06/Oct/2018' where date='29/Sep/2018';
+update tablesdata set date = '07/Oct/2018' where date='30/Sep/2018';
+
+
+
+update tablesdata set eventdate = '15/Oct/2018' where eventdate='01/Oct/2018';
+update tablesdata set eventdate = '16/Oct/2018' where eventdate='02/Oct/2018';
+update tablesdata set eventdate = '17/Oct/2018' where eventdate='03/Oct/2018';
+update tablesdata set eventdate = '18/Oct/2018' where eventdate='04/Oct/2018';
+update tablesdata set eventdate = '19/Oct/2018' where eventdate='05/Oct/2018';
+update tablesdata set eventdate = '20/Oct/2018' where eventdate='06/Oct/2018';
+update tablesdata set eventdate = '21/Oct/2018' where eventdate='07/Oct/2018';
+
+
+update bookingdetails set eventdate = '25/Sep/2018' where eventdate='14/Jun/2018';
+update bookingdetails set eventdate = '26/Sep/2018' where eventdate='22/Jun/2018';
+update bookingdetails set eventdate = '28/Sep/2018' where eventdate='10/Sep/2018';
+update bookingdetails set eventdate = '29/Sep/2018' where eventdate='11/Sep/2018';
+update bookingdetails set eventdate = '30/Sep/2018' where eventdate='12/Sep/2018';
+
+
+update bookingdetails set eventdate = '15/Oct/2018' where eventdate='01/Oct/2018';
+update bookingdetails set eventdate = '16/Oct/2018' where eventdate='02/Oct/2018';
+update bookingdetails set eventdate = '17/Oct/2018' where eventdate='03/Oct/2018';
+update bookingdetails set eventdate = '18/Oct/2018' where eventdate='04/Oct/2018';
+update bookingdetails set eventdate = '19/Oct/2018' where eventdate='05/Oct/2018';
+update bookingdetails set eventdate = '20/Oct/2018' where eventdate='06/Oct/2018';
+update bookingdetails set eventdate = '21/Oct/2018' where eventdate='07/Oct/2018';
+
+
+
+----------------
+
+
+update eventdetails set date = '23/Oct/2018' where date='15/Oct/2018';
+update eventdetails set date = '24/Oct/2018' where date='16/Oct/2018';
+update eventdetails set date = '25/Oct/2018' where date='17/Oct/2018';
+update eventdetails set date = '26/Oct/2018' where date='18/Oct/2018';
+update eventdetails set date = '27/Oct/2018' where date='19/Oct/2018';
+update eventdetails set date = '28/Oct/2018' where date='20/Oct/2018';
+update eventdetails set date = '29/Oct/2018' where date='21/Oct/2018';
+
+
+update ticketdetails set date = '19/Nov/2018' where date='30/Oct/2018';
+update ticketdetails set date = '20/Nov/2018' where date='31/Oct/2018';
+update ticketdetails set date = '21/Nov/2018' where date='01/Nov/2018';
+update ticketdetails set date = '22/Nov/2018' where date='02/Nov/2018';
+update ticketdetails set date = '23/Nov/2018' where date='03/Nov/2018';
+update ticketdetails set date = '24/Nov/2018' where date='04/Nov/2018';
+update ticketdetails set date = '25/Nov/2018' where date='05/Nov/2018';
+
+
+
+
+update tablesdata set eventdate = '30/Oct/2018' where eventdate='23/Oct/2018';
+update tablesdata set eventdate = '31/Oct/2018' where eventdate='24/Oct/2018';
+update tablesdata set eventdate = '01/Nov/2018' where eventdate='25/Oct/2018';
+update tablesdata set eventdate = '02/Nov/2018' where eventdate='26/Oct/2018';
+update tablesdata set eventdate = '03/Nov/2018' where eventdate='27/Oct/2018';
+update tablesdata set eventdate = '04/Nov/2018' where eventdate='28/Oct/2018';
+update tablesdata set eventdate = '05/Nov/2018' where eventdate='29/Oct/2018';
+
+
+
+update tablesdata set eventdate = '19/Nov/2018' where eventdate='30/Oct/2018';
+update tablesdata set eventdate = '20/Nov/2018' where eventdate='31/Oct/2018';
+update tablesdata set eventdate = '21/Nov/2018' where eventdate='01/Nov/2018';
+update tablesdata set eventdate = '22/Nov/2018' where eventdate='02/Nov/2018';
+update tablesdata set eventdate = '23/Nov/2018' where eventdate='03/Nov/2018';
+update tablesdata set eventdate = '24/Nov/2018' where eventdate='04/Nov/2018';
+update tablesdata set eventdate = '25/Nov/2018' where eventdate='05/Nov/2018';
+
+
+
+
+
+update bookingdetails set eventdate = '19/Nov/2018' where eventdate='30/Oct/2018';
+update bookingdetails set eventdate = '20/Nov/2018' where eventdate='31/Oct/2018';
+update bookingdetails set eventdate = '21/Nov/2018' where eventdate='01/Nov/2018';
+update bookingdetails set eventdate = '22/Nov/2018' where eventdate='02/Nov/2018';
+update bookingdetails set eventdate = '23/Nov/2018' where eventdate='03/Nov/2018';
+update bookingdetails set eventdate = '24/Nov/2018' where eventdate='04/Nov/2018';
+update bookingdetails set eventdate = '25/Nov/2018' where eventdate='05/Nov/2018';
+
+
+-----------------------
+
+update eventdetails set date = '03/Dec/2018' where date='19/Nov/2018';
+update eventdetails set date = '04/Dec/2018' where date='04/Nov/2018';
+update eventdetails set date = '05/Dec/2018' where date='05/Nov/2018';
+update eventdetails set date = '06/Dec/2018' where date='06/Nov/2018';
+update eventdetails set date = '07/Dec/2018' where date='07/Nov/2018';
+update eventdetails set date = '08/Dec/2018' where date='08/Nov/2018';
+update eventdetails set date = '09/Dec/2018' where date='09/Nov/2018';
+
+
+
+
+update ticketdetails set date = '03/Dec/2018' where date='19/Nov/2018';
+update ticketdetails set date = '04/Dec/2018' where date='20/Nov/2018';
+update ticketdetails set date = '05/Dec/2018' where date='21/Nov/2018';
+update ticketdetails set date = '06/Dec/2018' where date='22/Nov/2018';
+update ticketdetails set date = '07/Dec/2018' where date='23/Nov/2018';
+update ticketdetails set date = '08/Dec/2018' where date='24/Nov/2018';
+update ticketdetails set date = '09/Dec/2018' where date='25/Nov/2018';
+
+
+
+update tablesdata set eventdate = '03/Dec/2018' where eventdate='19/Nov/2018';
+update tablesdata set eventdate = '04/Dec/2018' where eventdate='20/Nov/2018';
+update tablesdata set eventdate = '05/Dec/2018' where eventdate='21/Nov/2018';
+update tablesdata set eventdate = '06/Dec/2018' where eventdate='22/Nov/2018';
+update tablesdata set eventdate = '07/Dec/2018' where eventdate='23/Nov/2018';
+update tablesdata set eventdate = '08/Dec/2018' where eventdate='24/Nov/2018';
+update tablesdata set eventdate = '09/Dec/2018' where eventdate='25/Nov/2018';
+
+update bookingdetails set eventdate = '03/Dec/2018' where eventdate='19/Nov/2018';
+update bookingdetails set eventdate = '04/Dec/2018' where eventdate='20/Nov/2018';
+update bookingdetails set eventdate = '05/Dec/2018' where eventdate='21/Nov/2018';
+update bookingdetails set eventdate = '06/Dec/2018' where eventdate='22/Nov/2018';
+update bookingdetails set eventdate = '07/Dec/2018' where eventdate='23/Nov/2018';
+update bookingdetails set eventdate = '08/Dec/2018' where eventdate='24/Nov/2018';
+update bookingdetails set eventdate = '09/Dec/2018' where eventdate='25/Nov/2018';
+
+
+
+
+update bookingdetails set eventdate = '17/Dec/2018' where eventdate='10/Dec/2018';
+update bookingdetails set eventdate = '18/Dec/2018' where eventdate='11/Dec/2018';
+update bookingdetails set eventdate = '19/Dec/2018' where eventdate='12/Dec/2018';
+update bookingdetails set eventdate = '20/Dec/2018' where eventdate='13/Dec/2018';
+update bookingdetails set eventdate = '21/Dec/2018' where eventdate='14/Dec/2018';
+update bookingdetails set eventdate = '22/Dec/2018' where eventdate='15/Dec/2018';
+update bookingdetails set eventdate = '23/Dec/2018' where eventdate='16/Dec/2018';
+
+
+
+keytool -exportcert -keystore /Users/vichi/guestlist.jks -list -v

@@ -1,5 +1,7 @@
 package com.application.club.guestlist.firebasenotifications;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
@@ -12,7 +14,8 @@ import android.graphics.BitmapFactory;
         import android.content.Intent;
 import android.media.RingtoneManager;
         import android.net.Uri;
-        import android.support.v4.app.NotificationCompat;
+import android.os.Build;
+import android.support.v4.app.NotificationCompat;
         import android.util.Log;
 
         import com.google.firebase.messaging.FirebaseMessagingService;
@@ -42,6 +45,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     String djname;
     String music;
     String eventName;
+    String offersDetails;
 
     /**
      * Called when message is received.
@@ -88,6 +92,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         eventDate = remoteMessage.getData().get(Constants.EVENT_DATE);
         passdiscount = remoteMessage.getData().get(Constants.PASS_DISCOUNT);
         tablediscount = remoteMessage.getData().get(Constants.TABLE_DISCOUNT);
+        offersDetails = remoteMessage.getData().get(Constants.OFFERS_DETAILS);
         //If the key AnotherActivity has  value as True then when the user taps on notification, in the app AnotherActivity will be opened.
         //If the key AnotherActivity has  value as False then when the user taps on notification, in the app MainActivity will be opened.
         String TrueOrFlase = remoteMessage.getData().get("AnotherActivity");
@@ -118,9 +123,14 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         intent.putExtra(Constants.IMAGE_URL, imageUri);
         intent.putExtra(Constants.TABLE_DISCOUNT, tablediscount);
         intent.putExtra(Constants.PASS_DISCOUNT, passdiscount);
+        intent.putExtra(Constants.OFFERS_DETAILS, offersDetails);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT);
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_CANCEL_CURRENT);
+
+//        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
+//                PendingIntent.FLAG_CANCEL_CURRENT );
 
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
@@ -131,12 +141,22 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                         .bigPicture(image))/*Notification with Image*/
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
+                .setPriority(Notification.PRIORITY_MAX)
                 .setContentIntent(pendingIntent);
 
         NotificationManager notificationManager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        notificationManager.notify(11 /* ID of notification */, notificationBuilder.build());
+        // Since android Oreo notification channel is needed.
+        String channelId = getString(R.string.default_notification_channel_id);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(channelId,
+                    "Channel human readable title",
+                    NotificationManager.IMPORTANCE_DEFAULT);
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
     }
 
     /*

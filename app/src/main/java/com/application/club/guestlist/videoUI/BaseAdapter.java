@@ -18,6 +18,8 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter<RecyclerView.V
     protected LayoutInflater inflater;
 
     public BaseAdapter(Activity activity) {
+        if(activity == null )
+            return;
         this.activity = activity;
         this.list = new ArrayList<>();
         this.inflater = activity.getLayoutInflater();

@@ -38,8 +38,22 @@
     </array>
 
     <string name="adress">
-        EasyAdNetwork \nB-2 Banglow, Thomos Church Compound \nIC Colony, Boriwali West-400103
+        GuestList \n1st Floor and 2nd Floor, Kagalwala House \nBandra Kurla Complex, Mumbai 400098
+
     </string>
+    <string name="default_notification_channel_id" translatable="false">guestlist_fcm_default_channel</string>
+
+
+
+
+    <string name="facebook_app_id">343969116414961</string>
+    <string name="fb_login_protocol_scheme">fb343969116414961</string>
+
+    <string name="welcome">welcome</string>
+    <string name="cancel_login">cancel</string>
+    <string name="error_login">error</string>
+    <string name="logout">logout</string>
+
 </resources>
 
 

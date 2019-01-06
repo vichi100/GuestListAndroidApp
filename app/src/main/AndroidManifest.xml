@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.application.club.guestlist">
 
     <!-- Required permission to use in-app billing. -->
@@ -11,6 +12,9 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
 
     <application
         android:name=".App"
@@ -18,13 +22,14 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        >
+        tools:replace="android:allowBackup"
+        android:theme="@style/AppTheme">
 
         <activity
             android:name="com.application.club.guestlist.login.LoginActivity"
             android:label="@string/app_name"
             android:windowSoftInputMode="adjustPan"
+            android:screenOrientation="portrait"
             >
 
             <intent-filter>
@@ -53,6 +58,7 @@
 
         <activity
             android:name="com.application.club.guestlist.MainActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name"></activity>
 
 
@@ -60,12 +66,14 @@
 
         <activity
             android:name="com.application.club.guestlist.bookingTable.TableSelectionWebClientActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name"></activity>
 
 
 
         <activity
             android:name="com.application.club.guestlist.profile.ProfileScreen"
+            android:screenOrientation="portrait"
             android:label="@string/app_name"></activity>
 
         <activity
@@ -74,38 +82,47 @@
 
         <activity
             android:name="com.application.club.guestlist.clubdetails.ClubDetailsListActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name"></activity>
 
         <activity
             android:name="com.application.club.guestlist.booking.BookGuestListActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name"></activity>
 
         <activity
             android:name="com.application.club.guestlist.qrcode.QRCodeActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name"></activity>
 
         <activity
             android:name="com.application.club.guestlist.bookedPasses.DisplayPassActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name"></activity>
 
         <activity
             android:name="com.application.club.guestlist.bookingTable.TableBookingActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name"></activity>
 
         <activity
             android:name="com.application.club.guestlist.booking.BookPassActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name"></activity>
 
         <activity
             android:name="com.application.club.guestlist.login.AboutUsActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name"></activity>
 
         <activity
             android:name="com.application.club.guestlist.menu.ChangeLocationActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name"></activity>
 
         <activity
             android:name="com.application.club.guestlist.login.SelectCityActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name"></activity>
 
 
@@ -115,6 +132,7 @@
         <activity
             android:exported="true"
             android:name="com.application.club.guestlist.menu.LocationChangeActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name"></activity>
         <intent-filter>
             <action android:name="com.application.club.guestlist.menu.LocationChangeActivity" />
@@ -123,6 +141,7 @@
 
         <activity
             android:name="com.application.club.guestlist.bookingTable.TableConfirmationActivity"
+            android:screenOrientation="portrait"
             android:label="@string/app_name"></activity>
 
         <!-- Firebase Notifications -->
@@ -130,6 +149,10 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/ic_launcher" />
+
+        <meta-data        android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id"/>
+
 
         <service android:name="com.application.club.guestlist.firebasenotifications.MyFirebaseMessagingService"
             android:enabled="true"
@@ -156,10 +179,63 @@
         <activity android:name="com.paytm.pgsdk.PaytmPGActivity"
             android:screenOrientation="portrait" android:configChanges="keyboardHidden|orientation|keyboard"/>
 
+        <!--<meta-data-->
+            <!--android:name="io.fabric.ApiKey"-->
+            <!--android:value="fabaabc4273e4e67d52a5410e9b2fa7a59088976" />-->
 
 
 
+        <!-- Facebook -->
+
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id" />
+
+
+        <activity
+            android:name="com.facebook.FacebookActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+            android:label="@string/app_name" />
+
+        <activity
+            android:name="com.facebook.CustomTabActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="@string/fb_login_protocol_scheme" />
+            </intent-filter>
+        </activity>
+
+
+        <activity android:name="com.application.club.guestlist.fblogin.LoginActivity" />
+
+        <!-- Facebook Ends-->
+
+
+
+
+    <meta-data android:name="instamojo.orderauth.url"
+                   android:value="http://199.180.133.121/instamojo/access_token.php"
+            />
     </application>
+    <uses-permission-sdk-23 android:name="android.permission.RECEIVE_SMS"/>
+ 
+    <uses-permission-sdk-23 android:name="android.permission.READ_SMS"/>
+ 
+    <uses-permission-sdk-23 android:name="android.permission.READ_PHONE_STATE"/>
+ 
+    <uses-permission android:name="android.permission.RECEIVE_SMS"/>
+ 
+    <uses-permission android:name="android.permission.READ_SMS"/>
+ 
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+ 
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+ 
 
 
 </manifest>

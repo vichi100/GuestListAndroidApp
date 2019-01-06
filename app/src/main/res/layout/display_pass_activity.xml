@@ -102,7 +102,7 @@
             android:layout_marginTop="5dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="We recommend to carry ID proof"
+            android:text="We recommend to carry ID proof \nClub rules applied \nClub reserves all rights of admission"
             android:textAlignment="center"
             android:textColor="#f2ad3d" />
 

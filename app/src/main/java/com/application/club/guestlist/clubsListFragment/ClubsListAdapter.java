@@ -28,6 +28,7 @@ import com.application.club.guestlist.videoUI.CameraAnimation;
 import com.application.club.guestlist.videoUI.FeedAdapter;
 import com.application.club.guestlist.videoUI.VideoView;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.hoanganhtuan95ptit.autoplayvideorecyclerview.VideoHolder;
 import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
@@ -52,6 +53,7 @@ public class ClubsListAdapter extends BaseAdapter<Feed> {
 
 
 	public ClubsListAdapter(Activity activity, List<Video> clubRowItemList) {
+
 		super(activity);
 		context = activity;
 		mActivity=activity;
@@ -114,7 +116,10 @@ public class ClubsListAdapter extends BaseAdapter<Feed> {
 		Glide.with(activity)
 				.load(Constants.HTTP_URL+feed.getInfo().getImageURL())
 				.override(screenWight, screenWight * 9 / 16)
-				.centerCrop()
+				//.centerCrop()
+				.diskCacheStrategy(DiskCacheStrategy.RESULT)
+				//.skipMemoryCache(true)
+				.fitCenter()
 				//.placeholder(R.drawable.circular_progress_bar)
 				.into(holder.ivInfo);
 		holder.vvInfo.setVideo((Video) feed.getInfo());
@@ -235,6 +240,8 @@ public class ClubsListAdapter extends BaseAdapter<Feed> {
 		public DemoVideoHolder(final View itemView) {
 			super(itemView);
 			manager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+			manager.setStreamMute(AudioManager.STREAM_MUSIC, true);
+
 
 			ButterKnife.bind(this, itemView);
 //			if(isMute){

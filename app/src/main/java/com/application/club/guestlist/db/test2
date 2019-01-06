@@ -1,228 +1,289 @@
-package com.application.club.guestlist.login;
-
-import android.content.SharedPreferences;
-import android.os.Bundle;
-
-import com.application.club.guestlist.MainActivity;
-import com.application.club.guestlist.R;
-import com.application.club.guestlist.offer.OfferDisplayActivity;
-import com.application.club.guestlist.service.EventListener;
-import com.application.club.guestlist.service.SocketOperator;
-import com.application.club.guestlist.utils.Constants;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
-
-import android.os.SystemClock;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.widget.Button;
-
-import android.content.Intent;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
-
-import org.json.JSONObject;
-
-/**
- * Created by vichi on 11/01/18.
- */
-
-public class LoginActivity extends AppCompatActivity implements  EventListener {
-
-    private static final String TAG = LoginActivity.class.getSimpleName();
-
-    Button button;
-
-    SocketOperator socketOperator  = new SocketOperator(this);
-
-    boolean isCustomerCreated = false;
-
-    boolean startMainActivityFlag = true;
-
-    String customerId = null;
-    
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.hide();
-
-
-
-
-
-        /*
-         * Check if we successfully logged in before.
-         * If we did, redirect to home page
-         */
-        SharedPreferences settings = getSharedPreferences(Constants.PREFS_NAME, 0);
-        if (settings.getString("logged", "").toString().equals("logged")) {
-
-            Bundle bundle = getIntent().getExtras();
-            Intent intentOffer = new Intent(this, OfferDisplayActivity.class);
-            if (bundle != null) {
-                boolean startOfferActivity = false;
-                for (String key : bundle.keySet()) {
-                    Object value = bundle.get(key);
-                    Log.d(TAG, "Key: " + key + " Value: " + value.toString());
-                    intentOffer.putExtra(key, value.toString());
-                    if(key.equalsIgnoreCase("clubid")){
-                        startOfferActivity = true;
-                        startMainActivityFlag = false;
-                    }
-
-
-                }
-                if(startOfferActivity == true){
-                    intentOffer.putExtra(Constants.IS_NOTIFICATION, "notification");
-                    startActivity(intentOffer);
-                }
-
-            }
-
-
-            if(startMainActivityFlag){
-
-                Intent intent = new Intent(LoginActivity.this,
-                        MainActivity.class);
-                String custmerName = settings.getString("name","");
-                String custmerMobile = settings.getString("mobile","");
-                intent.putExtra(Constants.CUSTOMERNAME, custmerName);
-                intent.putExtra(Constants.MOBILE, custmerMobile);
-                startActivity(intent);
-
-            }
-
-
-
-
-
-        }
-
-
-
-
-
-
-
-
-        // Locate the button in activity_main.xml
-        button = (Button) findViewById(R.id.next);
-
-        // Capture button clicks
-        button.setOnClickListener(new OnClickListener() {
-            public void onClick(View arg0) {
-
-                EditText cname = (EditText) findViewById(R.id.cname);
-                final String name = cname.getText().toString();
-                final EditText cmobile = (EditText) findViewById(R.id.cmobile);
-                final String mobile = cmobile.getText().toString();
-                EditText ccmobile = (EditText) findViewById(R.id.ccmobile);
-                final String confirmMobile = ccmobile.getText().toString();
-
-                if(null != name && !name.trim().equalsIgnoreCase("")) {
-
-                    if (null != mobile && mobile.trim().length() >= 10) {
-
-                        if (null != confirmMobile && confirmMobile.trim().length() >= 10 && mobile.equalsIgnoreCase(confirmMobile)) {
-
-
-                            /*
-                             * So login information is correct,
-                             * we will save the Preference data
-                             * and redirect to next class / home
-                             */
-                            try{
-
-                                CheckBox chkBox = (CheckBox) findViewById(R.id.chkIos);
-                                if(!chkBox.isChecked()){
-                                    Toast.makeText(LoginActivity.this, "Please confirm your age is 21", Toast.LENGTH_LONG).show();
-                                    return;
-                                }
-                                JSONObject customerDetails = new JSONObject();
-                                customerDetails.put("action", "createNewCustomer");
-                                customerDetails.put(Constants.CUSTOMERNAME, name);
-                                customerDetails.put(Constants.MOBILE, confirmMobile);
-
-                                socketOperator.sendMessage(customerDetails);
-
-                                while(!isCustomerCreated){
-                                    SystemClock.sleep(1000);
-                                }
-
-
-
-                            }catch (Exception ex){
-                                ex.printStackTrace();
-                            }
-
-
-                            SharedPreferences settings = getSharedPreferences(Constants.PREFS_NAME, 0);
-                            SharedPreferences.Editor editor = settings.edit();
-                            editor.putString("logged", "logged");
-                            editor.putString("name", name);
-                            editor.putString("mobile", confirmMobile);
-                            editor.putString(Constants.CUSTOMERID, customerId);
-                            editor.commit();
-
-
-
-                            Intent intent = new Intent(LoginActivity.this,
-                                    SelectCityActivity.class);
-
-//                            intent.putExtra(Constants.CUSTOMERNAME, name);
-//                            intent.putExtra(Constants.MOBILE, mobile);
-
-                            startActivity(intent);
-
-                        }else{
-                            Toast.makeText(LoginActivity.this, "Mobile Number are not matching!", Toast.LENGTH_LONG).show();
-                        }
-
-
-                    }else{
-                        Toast.makeText(LoginActivity.this, "Pleae Enter Correct Mobile Number !", Toast.LENGTH_LONG).show();
-                    }
-
-                }else{
-                    Toast.makeText(LoginActivity.this, "Pleae Enter Name !", Toast.LENGTH_LONG).show();
-                }
-
-
-            }
-        });
-    }
-
-
-    public void eventReceived(String message){
-        // conver message to list
-        if(message != null){
-
-            try{
-                if(message != null){
-                    JSONObject customerIdjObj = new JSONObject(message);
-                    customerId = customerIdjObj.getString(Constants.CUSTOMERID);
-
-                    isCustomerCreated = true;
-                }
-
-
-
-            }catch (Exception ex){
-                ex.printStackTrace();
-
-            }
-
-        }
-    }
-
-
-
-}
+INSERT INTO tablesdata ( clubid, clubname,tableid, tablenumber, details, tabletype, size, cost, coords, layoutURL, eventdate, booked)
+VALUES
+( '1000001' , 'HOP' , 'HOP-1000001-V1', 'V1', 'Only Imported liquor be serve on table', 'VIP', '10', '25000', '197,17,277,71', '/imagemap/1000001.html', '18/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V2', 'V2', 'Only Imported liquor be serve on table', 'VIP', '10', '25000', '294,19,373,72', '/imagemap/1000001.html', '18/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V3', 'V3', 'Only Imported liquor be serve on table', 'VIP', '10', '25000', '390,17,468,71', '/imagemap/1000001.html', '18/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V4', 'V4', 'Only Imported liquor be serve on table', 'VIP', '10', '25000', '486,16,565,73', '/imagemap/1000001.html', '18/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V5', 'V5', 'Only Imported liquor be serve on table', 'VIP', '10', '30000', '491,337,563,386', '/imagemap/1000001.html', '18/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V6', 'V6', 'Only Imported liquor be serve on table', 'VIP', '10', '30000', '404,339,476,386', '/imagemap/1000001.html', '18/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V7', 'V7', 'Only Imported liquor be serve on table', 'VIP', '10', '30000', '230,334,301,388', '/imagemap/1000001.html', '18/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V8', 'V8', 'Only Imported liquor be serve on table', 'VIP', '10', '30000', '147,335,215,385', '/imagemap/1000001.html', '18/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L1', 'L1', 'Service on table', 'NORMAL', '6', '15000', '328,107,374,151', '/imagemap/1000001.html', '18/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L2', 'L2', 'Service on table', 'NORMAL', '6', '15000', '468,88,506,133', '/imagemap/1000001.html', '18/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L3', 'L3', 'Service on table', 'NORMAL', '6', '15000', '468,237,508,283', '/imagemap/1000001.html', '18/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L4', 'L4', 'Service on table', 'NORMAL', '6', '15000', '326,254,371,298', '/imagemap/1000001.html', '18/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L5', 'L5', 'Service on table', 'NORMAL', '6', '15000', '183,245,225,292', '/imagemap/1000001.html', '18/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L6', 'L6', 'Service on table', 'NORMAL', '6', '15000', '131,82,171,130', '/imagemap/1000001.html', '18/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-PDR', 'PDR', 'Only Imported liquor be serve on table', 'NORMAL', '2', '50000', '12,273,131,388', '/imagemap/1000001.html', '18/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V1', 'V1', 'Only Imported liquor be serve on table', 'VIP', '10', '25000', '197,17,277,71', '/imagemap/1000001.html', '19/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V2', 'V2', 'Only Imported liquor be serve on table', 'VIP', '10', '25000', '294,19,373,72', '/imagemap/1000001.html', '19/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V3', 'V3', 'Only Imported liquor be serve on table', 'VIP', '10', '25000', '390,17,468,71', '/imagemap/1000001.html', '19/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V4', 'V4', 'Only Imported liquor be serve on table', 'VIP', '10', '25000', '486,16,565,73', '/imagemap/1000001.html', '19/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V5', 'V5', 'Only Imported liquor be serve on table', 'VIP', '10', '30000', '491,337,563,386', '/imagemap/1000001.html', '19/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V6', 'V6', 'Only Imported liquor be serve on table', 'VIP', '10', '30000', '404,339,476,386', '/imagemap/1000001.html', '19/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V7', 'V7', 'Only Imported liquor be serve on table', 'VIP', '10', '30000', '230,334,301,388', '/imagemap/1000001.html', '19/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V8', 'V8', 'Only Imported liquor be serve on table', 'VIP', '10', '30000', '147,335,215,385', '/imagemap/1000001.html', '19/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L1', 'L1', 'Service on table', 'NORMAL', '6', '15000', '328,107,374,151', '/imagemap/1000001.html', '19/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L2', 'L2', 'Service on table', 'NORMAL', '6', '15000', '468,88,506,133', '/imagemap/1000001.html', '19/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L3', 'L3', 'Service on table', 'NORMAL', '6', '15000', '468,237,508,283', '/imagemap/1000001.html', '19/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L4', 'L4', 'Service on table', 'NORMAL', '6', '15000', '326,254,371,298', '/imagemap/1000001.html', '19/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L5', 'L5', 'Service on table', 'NORMAL', '6', '15000', '183,245,225,292', '/imagemap/1000001.html', '19/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L6', 'L6', 'Service on table', 'NORMAL', '6', '15000', '131,82,171,130', '/imagemap/1000001.html', '19/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-PDR', 'PDR', 'Only Imported liquor be serve on table', 'VIP', '2', '50000', '12,273,131,388', '/imagemap/1000001.html', '19/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V1', 'V1', 'Only Imported liquor be serve on table', 'VIP', '10', '25000', '197,17,277,71', '/imagemap/1000001.html', '20/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V2', 'V2', 'Only Imported liquor be serve on table', 'VIP', '10', '25000', '294,19,373,72', '/imagemap/1000001.html', '20/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V3', 'V3', 'Only Imported liquor be serve on table', 'VIP', '10', '25000', '390,17,468,71', '/imagemap/1000001.html', '20/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V4', 'V4', 'Only Imported liquor be serve on table', 'VIP', '10', '25000', '486,16,565,73', '/imagemap/1000001.html', '20/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V5', 'V5', 'Only Imported liquor be serve on table', 'VIP', '10', '30000', '491,337,563,386', '/imagemap/1000001.html', '20/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V6', 'V6', 'Only Imported liquor be serve on table', 'VIP', '10', '30000', '404,339,476,386', '/imagemap/1000001.html', '20/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V7', 'V7', 'Only Imported liquor be serve on table', 'VIP', '10', '30000', '230,334,301,388', '/imagemap/1000001.html', '20/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V8', 'V8', 'Only Imported liquor be serve on table', 'VIP', '10', '30000', '147,335,215,385', '/imagemap/1000001.html', '20/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L1', 'L1', 'Service on table', 'NORMAL', '6', '15000', '328,107,374,151', '/imagemap/1000001.html', '20/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L2', 'L2', 'Service on table', 'NORMAL', '6', '15000', '468,88,506,133', '/imagemap/1000001.html', '20/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L3', 'L3', 'Service on table', 'NORMAL', '6', '15000', '468,237,508,283', '/imagemap/1000001.html', '20/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L4', 'L4', 'Service on table', 'NORMAL', '6', '15000', '326,254,371,298', '/imagemap/1000001.html', '20/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L5', 'L5', 'Service on table', 'NORMAL', '6', '15000', '183,245,225,292', '/imagemap/1000001.html', '20/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L6', 'L6', 'Service on table', 'NORMAL', '6', '15000', '131,82,171,130', '/imagemap/1000001.html', '20/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-PDR', 'PDR', 'Only Imported liquor be serve on table', 'VIP', '2', '50000', '12,273,131,388', '/imagemap/1000001.html', '20/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V1', 'V1', 'Only Imported liquor be serve on table', 'VIP', '10', '25000', '197,17,277,71', '/imagemap/1000001.html', '21/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V2', 'V2', 'Only Imported liquor be serve on table', 'VIP', '10', '25000', '294,19,373,72', '/imagemap/1000001.html', '21/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V3', 'V3', 'Only Imported liquor be serve on table', 'VIP', '10', '25000', '390,17,468,71', '/imagemap/1000001.html', '21/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V4', 'V4', 'Only Imported liquor be serve on table', 'VIP', '10', '25000', '486,16,565,73', '/imagemap/1000001.html', '21/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V5', 'V5', 'Only Imported liquor be serve on table', 'VIP', '10', '30000', '491,337,563,386', '/imagemap/1000001.html', '21/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V6', 'V6', 'Only Imported liquor be serve on table', 'VIP', '10', '30000', '404,339,476,386', '/imagemap/1000001.html', '21/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V7', 'V7', 'Only Imported liquor be serve on table', 'VIP', '10', '30000', '230,334,301,388', '/imagemap/1000001.html', '21/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V8', 'V8', 'Only Imported liquor be serve on table', 'VIP', '10', '30000', '147,335,215,385', '/imagemap/1000001.html', '21/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L1', 'L1', 'Service on table', 'NORMAL', '6', '15000', '328,107,374,151', '/imagemap/1000001.html', '21/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L2', 'L2', 'Service on table', 'NORMAL', '6', '15000', '468,88,506,133', '/imagemap/1000001.html', '21/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L3', 'L3', 'Service on table', 'NORMAL', '6', '15000', '468,237,508,283', '/imagemap/1000001.html', '21/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L4', 'L4', 'Service on table', 'NORMAL', '6', '15000', '326,254,371,298', '/imagemap/1000001.html', '21/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L5', 'L5', 'Service on table', 'NORMAL', '6', '15000', '183,245,225,292', '/imagemap/1000001.html', '21/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L6', 'L6', 'Service on table', 'NORMAL', '6', '15000', '131,82,171,130', '/imagemap/1000001.html', '21/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-PDR', 'PDR', 'Only Imported liquor be serve on table', 'VIP', '2', '50000', '12,273,131,388', '/imagemap/1000001.html', '21/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V1', 'V1', 'Only Imported liquor be serve on table', 'VIP', '10', '25000', '197,17,277,71', '/imagemap/1000001.html', '22/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V2', 'V2', 'Only Imported liquor be serve on table', 'VIP', '10', '25000', '294,19,373,72', '/imagemap/1000001.html', '22/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V3', 'V3', 'Only Imported liquor be serve on table', 'VIP', '10', '25000', '390,17,468,71', '/imagemap/1000001.html', '22/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V4', 'V4', 'Only Imported liquor be serve on table', 'VIP', '10', '25000', '486,16,565,73', '/imagemap/1000001.html', '22/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V5', 'V5', 'Only Imported liquor be serve on table', 'VIP', '10', '30000', '491,337,563,386', '/imagemap/1000001.html', '22/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V6', 'V6', 'Only Imported liquor be serve on table', 'VIP', '10', '30000', '404,339,476,386', '/imagemap/1000001.html', '22/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V7', 'V7', 'Only Imported liquor be serve on table', 'VIP', '10', '30000', '230,334,301,388', '/imagemap/1000001.html', '22/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-V8', 'V8', 'Only Imported liquor be serve on table', 'VIP', '10', '30000', '147,335,215,385', '/imagemap/1000001.html', '22/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L1', 'L1', 'Service on table', 'NORMAL', '6', '15000', '328,107,374,151', '/imagemap/1000001.html', '22/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L2', 'L2', 'Service on table', 'NORMAL', '6', '15000', '468,88,506,133', '/imagemap/1000001.html', '22/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L3', 'L3', 'Service on table', 'NORMAL', '6', '15000', '468,237,508,283', '/imagemap/1000001.html', '22/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L4', 'L4', 'Service on table', 'NORMAL', '6', '15000', '326,254,371,298', '/imagemap/1000001.html', '22/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L5', 'L5', 'Service on table', 'NORMAL', '6', '15000', '183,245,225,292', '/imagemap/1000001.html', '22/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-L6', 'L6', 'Service on table', 'NORMAL', '6', '15000', '131,82,171,130', '/imagemap/1000001.html', '22/Dec/2018', 'available'),
+( '1000001' , 'HOP' , 'HOP-1000001-PDR', 'PDR', 'Only Imported liquor be serve on table', 'VIP', '2', '50000', '12,273,131,388', '/imagemap/1000001.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-B1', 'B1', 'Service on table ', 'NORMAL', '8', '15000', '14,180,67,214', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-B2', 'B2', 'Service on table', 'NORMAL', '8', '15000', '93,177,148,214', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-B2', 'B3', 'Service on table', 'NORMAL', '8', '15000', '182,178,235,212', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-B4', 'B4', 'Service on table', 'NORMAL', '7', '15000', '277,170,296,217', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-B5', 'B5', 'Service on table', 'NORMAL', '7', '15000', '275,233,296,280', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-B6', 'B6', 'Service on table', 'NORMAL', '7', '15000', '276,300,295,349', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-B7', 'B7', 'Service on table', 'NORMAL', '7', '15000', '409,227,444,261', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D1', 'D1', 'Service on table', 'NORMAL', '5', '6000', '516,130,564,156', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D2', 'D2', 'Service on table', 'NORMAL', '5', '6000', '514,167,560,193', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D3', 'D3', 'Service on table', 'NORMAL', '5', '6000', '517,213,561,244', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D4', 'D4', 'Service on table', 'PREMIUM', '14', '30000', '511,288,560,341', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D5', 'D5', 'Service on table', 'NORMAL', '2', '3000', '469,276,489,297', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D6', 'D6', 'Service on table', 'NORMAL', '2', '3000', '468,243,492,265', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D7', 'D7', 'Service on table', 'NORMAL', '2', '3000', '469,209,488,231', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D8', 'D8', 'Service on table', 'NORMAL', '2', '3000', '466,173,492,198', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D9', 'D9', 'Service on table', 'NORMAL', '8', '10000', '404,126,448,161', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D10', 'D10', 'Service on table', 'NORMAL', '8', '10000', '362,126,391,163', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D11', 'D11', 'Service on table', 'NORMAL', '6', '10000', '315,144,346,166', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D12', 'D12', 'Service on table', 'NORMAL', '6', '10000', '314,177,346,199', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D13', 'D13', 'Service on table', 'NORMAL', '6', '10000', '311,212,343,233', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D14', 'D14', 'Service on table', 'NORMAL', '2', '3000', '363,191,390,212', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D15', 'D15', 'Service on table', 'NORMAL', '2', '3000', '361,222,390,243', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D16', 'D16', 'Service on table', 'NORMAL', '2', '3000', '363,253,391,273', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D17', 'D17', 'Service on table', 'NORMAL', '2', '3000', '364,286,391,307', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-K1', 'K1', 'Service on table', 'PREMIUM', '6', '20000', '359,91,318,68', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-K2', 'K2', 'Service on table', 'PREMIUM', '6', '20000', '372,69,408,90', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-K3', 'K3', 'Service on table', 'PREMIUM', '6', '20000', '423,68,459,89', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-K4', 'K4', 'Service on table', 'PREMIUM', '6', '20000', '479,68,526,89', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-DECK4', 'DECK4', 'Service on table', 'NORMAL', '2', '3000', '333,45,365,60', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-DECK5', 'DECK5', 'Service on table', 'NORMAL', '2', '3000', '375,46,406,61', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-DECK6', 'DECK6', 'Service on table', 'NORMAL', '2', '3000', '419,47,457,60', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-DECK7', 'DECK7', 'Service on table', 'NORMAL', '2', '3000', '471,47,508,60', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-DECK1', 'DECK1', 'Service on table', 'NORMAL', '8', '12000', '478,9,528,38', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-DECK2', 'DECK2', 'Service on table', 'NORMAL', '8', '12000', '400,8,445,34', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-DECK3', 'DECK3', 'Service on table', 'NORMAL', '8', '12000', '331,7,376,32', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A1', 'A1', 'Service on table', 'NORMAL', '6', '15000', '15,31,39,58', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A2', 'A2', 'Service on table', 'NORMAL', '6', '15000', '48,34,75,59', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A3', 'A3', 'Service on table', 'NORMAL', '6', '15000', '87,34,125,56', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A4', 'A4', 'Service on table', 'NORMAL', '6', '15000', '137,34,168,57', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A5', 'A5', 'Service on table', 'NORMAL', '6', '6000', '176,35,208,57', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A6', 'A6', 'Service on table', 'NORMAL', '4', '6000', '175,92,198,127', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A7', 'A7', 'Service on table', 'NORMAL', '4', '6000', '139,91,162,126', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A8', 'A8', 'Service on table', 'NORMAL', '4', '6000', '106,91,130,128', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A9', 'A9', 'Service on table', 'NORMAL', '4', '6000', '69,91,97,128', '/imagemap/1000000.html', '20/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-B1', 'B1', 'Service on table', 'NORMAL', '8', '30000', '14,180,67,214', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-B2', 'B2', 'Service on table', 'NORMAL', '8', '30000', '93,177,148,214', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-B2', 'B3', 'Service on table', 'NORMAL', '8', '30000', '182,178,235,212', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-B4', 'B4', 'Service on table', 'NORMAL', '7', '30000', '277,170,296,217', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-B5', 'B5', 'Service on table', 'NORMAL', '7', '30000', '275,233,296,280', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-B6', 'B6', 'Service on table', 'NORMAL', '7', '30000', '276,300,295,349', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-B7', 'B7', 'Service on table', 'NORMAL', '7', '30000', '409,227,444,261', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D1', 'D1', 'Service on table', 'NORMAL', '5', '10000', '516,130,564,156', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D2', 'D2', 'Service on table', 'NORMAL', '5', '10000', '517,213,561,244', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D3', 'D3', 'Service on table', 'NORMAL', '5', '10000', '517,213,561,244', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D4', 'D4', 'Service on table', 'VVIP', '14', '60000', '511,288,560,341', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D5', 'D5', 'Service on table', 'NORMAL', '2', '6000', '469,276,489,297', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D6', 'D6', 'Service on table', 'NORMAL', '2', '6000', '468,243,492,265', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D7', 'D7', 'Service on table', 'NORMAL', '2', '6000', '469,209,488,231', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D8', 'D8', 'Service on table', 'NORMAL', '2', '6000', '466,173,492,198', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D9', 'D9', 'Service on table', 'NORMAL', '8', '20000', '404,126,448,161', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D10', 'D10', 'Service on table', 'NORMAL', '8', '20000', '362,126,391,163', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D11', 'D11', 'Service on table', 'NORMAL', '6', '20000', '315,144,346,166', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D12', 'D12', 'Service on table', 'NORMAL', '6', '20000', '314,177,346,199', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D13', 'D13', 'Service on table', 'NORMAL', '6', '20000', '311,212,343,233', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D14', 'D14', 'Service on table', 'NORMAL', '2', '6000', '363,191,390,212', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D15', 'D15', 'Service on table', 'NORMAL', '2', '6000', '361,222,390,243', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D16', 'D16', 'Service on table', 'NORMAL', '2', '6000', '363,253,391,273', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D17', 'D17', 'Service on table', 'NORMAL', '2', '6000', '364,286,391,307', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-K1', 'K1', 'Service on table', 'PREMIUM', '6', '40000', '359,91,318,68', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-K2', 'K2', 'Service on table', 'PREMIUM', '6', '40000', '372,69,408,90', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-K3', 'K3', 'Service on table', 'PREMIUM', '6', '40000', '423,68,459,89', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-K4', 'K4', 'Service on table', 'PREMIUM', '6', '40000', '479,68,526,89', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-DECK4', 'DECK4', 'Service on table', 'NORMAL', '2', '6000', '333,45,365,60', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-DECK5', 'DECK5', 'Service on table', 'NORMAL', '2', '6000', '375,46,406,61', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-DECK6', 'DECK6', 'Service on table', 'NORMAL', '2', '6000', '419,47,457,60', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-DECK7', 'DECK7', 'Service on table', 'NORMAL', '2', '6000', '471,47,508,60', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-DECK1', 'DECK1', 'Service on table', 'NORMAL', '8', '30000', '478,9,528,38', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-DECK2', 'DECK2', 'Service on table', 'NORMAL', '8', '30000', '400,8,445,34', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-DECK3', 'DECK3', 'Service on table', 'NORMAL', '8', '30000', '331,7,376,32', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A1', 'A1', 'Service on table', 'NORMAL', '6', '25000', '15,31,39,58', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A2', 'A2', 'Service on table', 'NORMAL', '6', '25000', '48,34,75,59', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A3', 'A3', 'Service on table', 'NORMAL', '6', '25000', '87,34,125,56', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A4', 'A4', 'Service on table', 'NORMAL', '6', '25000', '137,34,168,57', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A5', 'A5', 'Service on table', 'NORMAL', '6', '25000', '176,35,208,57', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A6', 'A6', 'Service on table', 'NORMAL', '4', '13000', '175,92,198,127', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A7', 'A7', 'Service on table', 'NORMAL', '4', '15000', '139,91,162,126', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A8', 'A8', 'Service on table', 'NORMAL', '4', '15000', '106,91,130,128', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A9', 'A9', 'Service on table', 'NORMAL', '4', '15000', '69,91,97,128', '/imagemap/1000000.html', '21/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-B1', 'B1', 'Service on table', 'NORMAL', '8', '30000', '14,180,67,214', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-B2', 'B2', 'Service on table', 'NORMAL', '8', '30000', '93,177,148,214', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-B2', 'B3', 'Service on table', 'NORMAL', '8', '30000', '182,178,235,212', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-B4', 'B4', 'Service on table', 'NORMAL', '7', '30000', '277,170,296,217', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-B5', 'B5', 'Service on table', 'NORMAL', '7', '30000', '275,233,296,280', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-B6', 'B6', 'Service on table', 'NORMAL', '7', '30000', '276,300,295,349', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-B7', 'B7', 'Service on table', 'NORMAL', '7', '30000', '409,227,444,261', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D1', 'D1', 'Service on table', 'NORMAL', '5', '10000', '516,130,564,156', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D2', 'D2', 'Service on table', 'NORMAL', '5', '10000', '517,213,561,244', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D3', 'D3', 'Service on table', 'NORMAL', '5', '10000', '517,213,561,244', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D4', 'D4', 'Service on table', 'VVIP', '14', '60000', '511,288,560,341', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D5', 'D5', 'Service on table', 'NORMAL', '2', '6000', '469,276,489,297', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D6', 'D6', 'Service on table', 'NORMAL', '2', '6000', '468,243,492,265', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D7', 'D7', 'Service on table', 'NORMAL', '2', '6000', '469,209,488,231', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D8', 'D8', 'Service on table', 'NORMAL', '2', '6000', '466,173,492,198', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D9', 'D9', 'Service on table', 'NORMAL', '8', '20000', '404,126,448,161', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D10', 'D10', 'Service on table', 'NORMAL', '8', '20000', '362,126,391,163', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D11', 'D11', 'Service on table', 'NORMAL', '6', '20000', '315,144,346,166', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D12', 'D12', 'Service on table', 'NORMAL', '6', '20000', '314,177,346,199', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D13', 'D13', 'Service on table', 'NORMAL', '6', '20000', '311,212,343,233', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D14', 'D14', 'Service on table', 'NORMAL', '2', '6000', '363,191,390,212', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D15', 'D15', 'Service on table', 'NORMAL', '2', '6000', '361,222,390,243', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D16', 'D16', 'Service on table', 'NORMAL', '2', '6000', '363,253,391,273', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-D17', 'D17', 'Service on table', 'NORMAL', '2', '6000', '364,286,391,307', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-K1', 'K1', 'Service on table', 'PREMIUM', '6', '40000', '359,91,318,68', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-K2', 'K2', 'Service on table', 'PREMIUM', '6', '40000', '372,69,408,90', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-K3', 'K3', 'Service on table', 'PREMIUM', '6', '40000', '423,68,459,89', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-K4', 'K4', 'Service on table', 'PREMIUM', '6', '40000', '479,68,526,89', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-DECK4', 'DECK4', 'Service on table', 'NORMAL', '2', '6000', '333,45,365,60', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-DECK5', 'DECK5', 'Service on table', 'NORMAL', '2', '6000', '375,46,406,61', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-DECK6', 'DECK6', 'Service on table', 'NORMAL', '2', '6000', '419,47,457,60', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-DECK7', 'DECK7', 'Service on table', 'NORMAL', '2', '6000', '471,47,508,60', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-DECK1', 'DECK1', 'Service on table', 'NORMAL', '8', '30000', '478,9,528,38', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-DECK2', 'DECK2', 'Service on table', 'NORMAL', '8', '30000', '400,8,445,34', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-DECK3', 'DECK3', 'Service on table', 'NORMAL', '8', '30000', '331,7,376,32', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A1', 'A1', 'Service on table', 'NORMAL', '6', '25000', '15,31,39,58', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A2', 'A2', 'Service on table', 'NORMAL', '6', '25000', '48,34,75,59', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A3', 'A3', 'Service on table', 'NORMAL', '6', '25000', '87,34,125,56', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A4', 'A4', 'Service on table', 'NORMAL', '6', '25000', '137,34,168,57', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A5', 'A5', 'Service on table', 'NORMAL', '6', '25000', '176,35,208,57', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A6', 'A6', 'Service on table', 'NORMAL', '4', '13000', '175,92,198,127', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A7', 'A7', 'Service on table', 'NORMAL', '4', '15000', '139,91,162,126', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A8', 'A8', 'Service on table', 'NORMAL', '4', '15000', '106,91,130,128', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '1000000' , 'Hoot' , 'HOOT-1000000-A9', 'A9', 'Service on table', 'NORMAL', '4', '15000', '69,91,97,128', '/imagemap/1000000.html', '22/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-01', '01', 'Service on table', 'NORMAL', '6', '10000', '41,153,87,214', '/imagemap/999999.html', '19/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-02', '02', 'Service on table', 'NORMAL', '6', '10000', '37,76,91,135', '/imagemap/999999.html', '19/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-03', '03', 'Service on table', 'NORMAL', '6', '10000', '124,77,171,133', '/imagemap/999999.html', '19/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-04', '04', 'Service on table', 'NORMAL', '6', '20000', '232,73,281,122', '/imagemap/999999.html', '19/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-05', '05', 'Service on table', 'NORMAL', '6', '20000', '298,76,347,123', '/imagemap/999999.html', '19/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-06', '06', 'Service on table', 'NORMAL', '6', '20000', '377,75,426,124', '/imagemap/999999.html', '19/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-11', '11', 'Service on table', 'NORMAL', '5', '10000', '336,142,370,179', '/imagemap/999999.html', '19/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-12', '12', 'Service on table', 'NORMAL', '5', '10000', '383,141,429,178', '/imagemap/999999.html', '19/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-14', '14', 'Service on table', 'NORMAL', '5', '10000', '333,193,371,228', '/imagemap/999999.html', '19/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-9A', '9A', 'Service on table', 'NORMAL', '5', '10000', '384,191,423,230', '/imagemap/999999.html', '19/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-18', '18', 'Service on table', 'NORMAL', '5', '10000', '329,264,368,294', '/imagemap/999999.html', '19/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-19', '19', 'Service on table', 'NORMAL', '5', '10000', '383,264,416,291', '/imagemap/999999.html', '19/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-C1', 'C1', 'Service on table', 'PREMIUM', '12', '30000', '299,308,417,347', '/imagemap/999999.html', '19/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-20', '20', 'Service on table', 'NORMAL', '6', '20000', '459,187,487,217', '/imagemap/999999.html', '19/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-21', '21', 'Service on table', 'NORMAL', '6', '25000', '523,187,557,211', '/imagemap/999999.html', '19/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-22', '22', 'Service on table', 'NORMAL', '6', '25000', '523,219,559,238', '/imagemap/999999.html', '19/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-23', '23', 'Service on table', 'NORMAL', '6', '25000', '522,245,562,265', '/imagemap/999999.html', '19/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-24', '24', 'Service on table', 'NORMAL', '6', '25000', '520,273,557,295', '/imagemap/999999.html', '19/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-25', '25', 'Service on table', 'NORMAL', '6', '20000', '460,247,488,276', '/imagemap/999999.html', '19/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-PDR', 'PDR', 'Service on table', 'VVIP', '30', '50000', '463,306,558,379', '/imagemap/999999.html', '19/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-01', '01', 'Service on table', 'NORMAL', '6', '10000', '41,153,87,214', '/imagemap/999999.html', '21/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-02', '02', 'Service on table', 'NORMAL', '6', '10000', '37,76,91,135', '/imagemap/999999.html', '21/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-03', '03', 'Service on table', 'NORMAL', '6', '10000', '124,77,171,133', '/imagemap/999999.html', '21/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-04', '04', 'Service on table', 'NORMAL', '6', '20000', '232,73,281,122', '/imagemap/999999.html', '21/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-05', '05', 'Service on table', 'NORMAL', '6', '20000', '298,76,347,123', '/imagemap/999999.html', '21/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-06', '06', 'Service on table', 'NORMAL', '6', '20000', '377,75,426,124', '/imagemap/999999.html', '21/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-11', '11', 'Service on table', 'NORMAL', '5', '10000', '336,142,370,179', '/imagemap/999999.html', '21/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-12', '12', 'Service on table', 'NORMAL', '5', '10000', '383,141,429,178', '/imagemap/999999.html', '21/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-14', '14', 'Service on table', 'NORMAL', '5', '10000', '333,193,371,228', '/imagemap/999999.html', '21/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-9A', '9A', 'Service on table', 'NORMAL', '5', '10000', '384,191,423,230', '/imagemap/999999.html', '21/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-18', '18', 'Service on table', 'NORMAL', '5', '10000', '329,264,368,294', '/imagemap/999999.html', '21/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-19', '19', 'Service on table', 'NORMAL', '5', '10000', '383,264,416,291', '/imagemap/999999.html', '21/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-C1', 'C1', 'Service on table', 'PREMIUM', '12', '30000', '299,308,417,347', '/imagemap/999999.html', '21/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-20', '20', 'Service on table', 'NORMAL', '6', '20000', '459,187,487,217', '/imagemap/999999.html', '21/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-21', '21', 'Service on table', 'NORMAL', '6', '25000', '523,187,557,211', '/imagemap/999999.html', '21/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-22', '22', 'Service on table', 'NORMAL', '6', '25000', '523,219,559,238', '/imagemap/999999.html', '21/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-23', '23', 'Service on table', 'NORMAL', '6', '25000', '522,245,562,265', '/imagemap/999999.html', '21/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-24', '24', 'Service on table', 'NORMAL', '6', '25000', '520,273,557,295', '/imagemap/999999.html', '21/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-25', '25', 'Service on table', 'NORMAL', '6', '20000', '460,247,488,276', '/imagemap/999999.html', '21/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-PDR', 'PDR', 'Service on table', 'VVIP', '30', '50000', '463,306,558,379', '/imagemap/999999.html', '21/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-01', '01', 'Service on table', 'NORMAL', '6', '10000', '41,153,87,214', '/imagemap/999999.html', '22/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-02', '02', 'Service on table', 'NORMAL', '6', '10000', '37,76,91,135', '/imagemap/999999.html', '22/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-03', '03', 'Service on table', 'NORMAL', '6', '10000', '124,77,171,133', '/imagemap/999999.html', '22/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-04', '04', 'Service on table', 'NORMAL', '6', '20000', '232,73,281,122', '/imagemap/999999.html', '22/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-05', '05', 'Service on table', 'NORMAL', '6', '20000', '298,76,347,123', '/imagemap/999999.html', '22/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-06', '06', 'Service on table', 'NORMAL', '6', '20000', '377,75,426,124', '/imagemap/999999.html', '22/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-11', '11', 'Service on table', 'NORMAL', '5', '10000', '336,142,370,179', '/imagemap/999999.html', '22/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-12', '12', 'Service on table', 'NORMAL', '5', '10000', '383,141,429,178', '/imagemap/999999.html', '22/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-14', '14', 'Service on table', 'NORMAL', '5', '10000', '333,193,371,228', '/imagemap/999999.html', '22/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-9A', '9A', 'Service on table', 'NORMAL', '5', '10000', '384,191,423,230', '/imagemap/999999.html', '22/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-18', '18', 'Service on table', 'NORMAL', '5', '10000', '329,264,368,294', '/imagemap/999999.html', '22/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-19', '19', 'Service on table', 'NORMAL', '5', '10000', '383,264,416,291', '/imagemap/999999.html', '22/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-C1', 'C1', 'Service on table', 'PREMIUM', '12', '30000', '299,308,417,347', '/imagemap/999999.html', '22/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-20', '20', 'Service on table', 'NORMAL', '6', '20000', '459,187,487,217', '/imagemap/999999.html', '22/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-21', '21', 'Service on table', 'NORMAL', '6', '25000', '523,187,557,211', '/imagemap/999999.html', '22/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-22', '22', 'Service on table', 'NORMAL', '6', '25000', '523,219,559,238', '/imagemap/999999.html', '22/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-23', '23', 'Service on table', 'NORMAL', '6', '25000', '522,245,562,265', '/imagemap/999999.html', '22/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-24', '24', 'Service on table', 'NORMAL', '6', '25000', '520,273,557,295', '/imagemap/999999.html', '22/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-25', '25', 'Service on table', 'NORMAL', '6', '20000', '460,247,488,276', '/imagemap/999999.html', '22/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-PDR', 'PDR', 'Service on table', 'VVIP', '30', '50000', '463,306,558,379', '/imagemap/999999.html', '22/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-01', '01', 'Service on table', 'NORMAL', '6', '10000', '41,153,87,214', '/imagemap/999999.html', '23/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-02', '02', 'Service on table', 'NORMAL', '6', '10000', '37,76,91,135', '/imagemap/999999.html', '23/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-03', '03', 'Service on table', 'NORMAL', '6', '10000', '124,77,171,133', '/imagemap/999999.html', '23/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-04', '04', 'Service on table', 'NORMAL', '6', '20000', '232,73,281,122', '/imagemap/999999.html', '23/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-05', '05', 'Service on table', 'NORMAL', '6', '20000', '298,76,347,123', '/imagemap/999999.html', '23/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-06', '06', 'Service on table', 'NORMAL', '6', '20000', '377,75,426,124', '/imagemap/999999.html', '23/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-11', '11', 'Service on table', 'NORMAL', '5', '10000', '336,142,370,179', '/imagemap/999999.html', '23/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-12', '12', 'Service on table', 'NORMAL', '5', '10000', '383,141,429,178', '/imagemap/999999.html', '23/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-14', '14', 'Service on table', 'NORMAL', '5', '10000', '333,193,371,228', '/imagemap/999999.html', '23/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-9A', '9A', 'Service on table', 'NORMAL', '5', '10000', '384,191,423,230', '/imagemap/999999.html', '23/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-18', '18', 'Service on table', 'NORMAL', '5', '10000', '329,264,368,294', '/imagemap/999999.html', '23/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-19', '19', 'Service on table', 'NORMAL', '5', '10000', '383,264,416,291', '/imagemap/999999.html', '23/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-C1', 'C1', 'Service on table', 'PREMIUM', '12', '30000', '299,308,417,347', '/imagemap/999999.html', '23/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-20', '20', 'Service on table', 'NORMAL', '6', '20000', '459,187,487,217', '/imagemap/999999.html', '23/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-21', '21', 'Service on table', 'NORMAL', '6', '25000', '523,187,557,211', '/imagemap/999999.html', '23/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-22', '22', 'Service on table', 'NORMAL', '6', '25000', '523,219,559,238', '/imagemap/999999.html', '23/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-23', '23', 'Service on table', 'NORMAL', '6', '25000', '522,245,562,265', '/imagemap/999999.html', '23/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-24', '24', 'Service on table', 'NORMAL', '6', '25000', '520,273,557,295', '/imagemap/999999.html', '23/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-25', '25', 'Service on table', 'NORMAL', '6', '20000', '460,247,488,276', '/imagemap/999999.html', '23/Dec/2018', 'available'),
+( '999999' , 'Tippling Street' , 'TS-999999-PDR', 'PDR', 'Service on table', 'VVIP', '30', '50000', '463,306,558,379', '/imagemap/999999.html', '23/Dec/2018', 'available');

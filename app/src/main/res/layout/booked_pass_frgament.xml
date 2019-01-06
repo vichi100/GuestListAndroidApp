@@ -7,6 +7,14 @@
     android:background="#2b292a"
     android:fillViewport="true">
 
+
+    <ProgressBar
+        android:id="@+id/progressBar1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone" />
+
     <ListView
         android:id="@android:id/list"
         android:layout_width="match_parent"

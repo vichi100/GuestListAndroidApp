@@ -23,10 +23,10 @@ public abstract class BaseActivity extends AppCompatActivity implements AHBottom
 //        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
 //        setSupportActionBar(toolbar);
 
-        bottomNavigation= (AHBottomNavigation) findViewById(R.id.myBottomNavigation_ID);
-
-        bottomNavigation.setOnTabSelectedListener(this);
-        this.createNavItems();
+//        bottomNavigation= (AHBottomNavigation) findViewById(R.id.myBottomNavigation_ID);
+//
+//        bottomNavigation.setOnTabSelectedListener(this);
+//        this.createNavItems();
 
     }
 

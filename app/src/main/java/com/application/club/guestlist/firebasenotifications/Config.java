@@ -9,6 +9,7 @@ public class Config {
 
     // global topic to receive app wide push notifications
     public static final String TOPIC_GLOBAL = "CLUB_GUEST_LIST_TPOIC";
+    public static final String TOPIC_TEST = "CLUB_GUEST_LIST_TPOIC_TEST";
 
     // broadcast receiver intent filters
     public static final String REGISTRATION_COMPLETE = "registrationComplete";

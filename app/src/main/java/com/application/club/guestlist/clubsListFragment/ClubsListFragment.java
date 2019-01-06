@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -19,6 +20,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.content.res.TypedArray;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -61,6 +63,7 @@ import com.application.club.guestlist.autoplayvideorecyclerview.AutoPlayVideoRec
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import dmax.dialog.SpotsDialog;
 
 import static com.application.club.guestlist.utils.Constants.LAT_LONG;
 
@@ -95,6 +98,7 @@ public class ClubsListFragment extends Fragment implements   SearchView.OnQueryT
     ProgressBar linlaHeaderProgress;
 
     AlertDialog alert;
+    private android.app.AlertDialog progressDialog;
 
     @BindView(R.id.listFeed)
     AutoPlayVideoRecyclerView listFeed;
@@ -113,6 +117,38 @@ public class ClubsListFragment extends Fragment implements   SearchView.OnQueryT
 
 		super.onActivityCreated(savedInstanceState);
         //getActivity().getActionBar().setTitle("City");
+
+
+        try {
+            if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED ) {
+                ActivityCompat.requestPermissions(getActivity(), new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, 101);
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+
+
+        LocationManager lm = (LocationManager)getActivity().getSystemService(Context.LOCATION_SERVICE);
+        List<String> providers = lm.getProviders(true);
+        Location bestLocation = null;
+        for (String provider : providers) {
+            Location l = lm.getLastKnownLocation(provider);
+            if (l == null) {
+                continue;
+            }
+            if (bestLocation == null || l.getAccuracy() < bestLocation.getAccuracy()) {
+                // Found best last known location: %s", l);
+                bestLocation = l;
+            }
+        }
+
+        Location location = bestLocation;//lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+//        double longitude = location.getLongitude();
+//        double latitude = location.getLatitude();
+        if(location != null){
+            latlong = location.getLatitude()+","+location.getLongitude();
+        }
+
 
         listFeed = (AutoPlayVideoRecyclerView) getActivity().findViewById(R.id.listFeed);
 
@@ -137,13 +173,18 @@ public class ClubsListFragment extends Fragment implements   SearchView.OnQueryT
                 });
         alert = builder.create();
 
-        linlaHeaderProgress = (ProgressBar) getActivity().findViewById(R.id.progressBar1);
+        //linlaHeaderProgress = (ProgressBar) getActivity().findViewById(R.id.progressBar1);
+        progressDialog= new SpotsDialog.Builder().setContext(getActivity()).setTheme(R.style.Custom).build();
+
+
 
         mLocationRequest = new LocationRequest();
-        mLocationRequest.setInterval(2*60*1000);
+        mLocationRequest.setInterval(1 * 1000);
         mLocationRequest.setFastestInterval(500);
-        mLocationRequest.setSmallestDisplacement(1000);
+        //mLocationRequest.setSmallestDisplacement(1000);
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+
         mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -151,6 +192,9 @@ public class ClubsListFragment extends Fragment implements   SearchView.OnQueryT
                 .build();
 
         mGoogleApiClient.connect();
+
+//        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,
+//                mLocationRequest, this);
 
 
 
@@ -170,6 +214,8 @@ public class ClubsListFragment extends Fragment implements   SearchView.OnQueryT
 
 
 	}
+
+
 
 
 	private void getclubListFromDatabase(){
@@ -366,22 +412,36 @@ public class ClubsListFragment extends Fragment implements   SearchView.OnQueryT
     public void resetSearch() {
 //        mAdapter = new ArrayAdapter<>(mContext, R.layout.club_item_list, mAllValues);
 //        setListAdapter(mAdapter);
-
-        adapter = new ClubsListAdapter(getActivity(), clubRowItemList);
-        listFeed.setAdapter(adapter);
-        listFeed.setAdapter(adapter);
-        for(Video v : clubRowItemList){
-            adapter.add(new Feed(v,Feed.Model.M1));
+        try{
+            adapter = new ClubsListAdapter(getActivity(), clubRowItemList);
+            listFeed.setAdapter(adapter);
+            listFeed.setAdapter(adapter);
+            for(Video v : clubRowItemList){
+                adapter.add(new Feed(v,Feed.Model.M1));
+            }
+            //setListAdapter(adapter);
+            //listFeed.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+        }catch (Exception ex){
+            ex.printStackTrace();
         }
-        //setListAdapter(adapter);
-        //listFeed.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
+
     }
 
     @Override
     public void onPause() {
         super.onPause();
         if (listFeed.getHandingVideoHolder() != null) listFeed.getHandingVideoHolder().stopVideo();
+
+        Log.v(this.getClass().getSimpleName(), "onPause()");
+
+        //Disconnect from API onPause()
+        if (mGoogleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
+            mGoogleApiClient.disconnect();
+        }
+
+
     }
 
 //    public void filter(String text) {
@@ -426,9 +486,20 @@ public class ClubsListFragment extends Fragment implements   SearchView.OnQueryT
 
     @Override
     public void onStart() {
-        mGoogleApiClient.connect();
         super.onStart();
+        mGoogleApiClient.connect();
+
     }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //Now lets connect to the API
+        mGoogleApiClient.connect();
+    }
+
+
 
 //    @Override
 //    public void onResume() {
@@ -464,39 +535,44 @@ public class ClubsListFragment extends Fragment implements   SearchView.OnQueryT
     @Override
     public void onConnected(@Nullable Bundle bundle) {
 
-        if (ActivityCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            ActivityCompat.requestPermissions(getActivity(),
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
+	    try {
 
-            return;
-        }
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                mGoogleApiClient, mLocationRequest, this);
+            if (ActivityCompat.checkSelfPermission(getActivity(),
+                    Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(getActivity(),
+                    Manifest.permission.ACCESS_COARSE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                        MY_PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
 
-        Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        if (mLastLocation != null) {
-            // here we go you can see current lat long.
-            //Log.e(TAG, "onConnected: " + String.valueOf(mLastLocation.getLatitude()) + ":" + String.valueOf(mLastLocation.getLongitude()));
+                return;
+            }
+            LocationServices.FusedLocationApi.requestLocationUpdates(
+                    mGoogleApiClient, mLocationRequest, this);
+
+            Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+            if (mLastLocation != null) {
+                // here we go you can see current lat long.
+                //Log.e(TAG, "onConnected: " + String.valueOf(mLastLocation.getLatitude()) + ":" + String.valueOf(mLastLocation.getLongitude()));
 //            Toast.makeText(getActivity(),
 //                    "permission was granted, :)"+"onConnected: " + String.valueOf(mLastLocation.getLatitude()) + ":" + String.valueOf(mLastLocation.getLongitude()),
 //                    Toast.LENGTH_LONG).show();
-            latlong = String.valueOf(mLastLocation.getLatitude())+","+String.valueOf(mLastLocation.getLongitude());
+                latlong = String.valueOf(mLastLocation.getLatitude()) + "," + String.valueOf(mLastLocation.getLongitude());
 
+            }
+            //getclubListFromDatabase();
+        }catch (Exception ex){
+	        ex.printStackTrace();
         }
-        //getclubListFromDatabase();
 
     }
 
@@ -552,7 +628,14 @@ public class ClubsListFragment extends Fragment implements   SearchView.OnQueryT
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            linlaHeaderProgress.setVisibility(View.VISIBLE);
+//            progressDialog.setTitle("please wait");
+//            progressDialog.setMessage("please wait");
+            progressDialog.setCancelable(true);
+            if(! ClubsListFragment.this.getActivity().isFinishing()){
+                progressDialog.show();
+            }
+
+            //linlaHeaderProgress.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -564,16 +647,23 @@ public class ClubsListFragment extends Fragment implements   SearchView.OnQueryT
         @Override
         protected void onPostExecute(String file_url) {
 
-            adapter = new ClubsListAdapter(getActivity(), clubRowItemList);
-            //setListAdapter(adapter);
-            listFeed.setAdapter(adapter);
-            for(Video v : clubRowItemList){
-                adapter.add(new Feed(v,Feed.Model.M1));
+            try {
+
+                adapter = new ClubsListAdapter(ClubsListFragment.this.getActivity(), clubRowItemList);
+                //setListAdapter(adapter);
+                listFeed.setAdapter(adapter);
+                for (Video v : clubRowItemList) {
+                    adapter.add(new Feed(v, Feed.Model.M1));
+                }
+
+
+            }catch (Exception ex){
+                ex.printStackTrace();
+            }finally {
+                if (progressDialog != null && progressDialog.isShowing()) {
+                    progressDialog.dismiss();
+                }
             }
-
-
-
-            linlaHeaderProgress.setVisibility(View.GONE);
 
 
         }
@@ -599,7 +689,7 @@ public class ClubsListFragment extends Fragment implements   SearchView.OnQueryT
 //                    SystemClock.sleep(5*1000);
 //                }
 
-                alert.show();
+                //alert.show();
                 task.cancel(true);
             }
 

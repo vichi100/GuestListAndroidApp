@@ -12,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.application.club.guestlist.bookingTable.TableSelectionWebClientActivity;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.squareup.picasso.Picasso;
 import com.application.club.guestlist.R;
 import com.application.club.guestlist.booking.BookGuestListActivity;
@@ -61,7 +63,14 @@ public class ClubsDetailListAdapter extends ArrayAdapter<ClubEventsDetailsItem> 
 
 
          ImageView imgIcon = (ImageView) convertView.findViewById(R.id.ivUserIcon);
-         Picasso.with(this.getContext()).load(Constants.HTTP_URL+imgURL).into(imgIcon);
+         //Picasso.with(this.getContext()).load(Constants.HTTP_URL+imgURL).into(imgIcon);
+         Glide.with(this.getContext())
+                 .load(Constants.HTTP_URL+imgURL)
+                 //.placeholder(R.drawable.circular_progress_bar)
+                 //.apply(options)
+                 .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                 //.skipMemoryCache(true)
+                 .into(imgIcon);
 
          TextView tvDay = (TextView) convertView.findViewById(R.id.day);
          String day = UtillMethods.getDayFromDate(clubEventsDetailsItem.getDate());

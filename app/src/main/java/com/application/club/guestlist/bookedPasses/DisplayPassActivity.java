@@ -92,7 +92,7 @@ public class DisplayPassActivity extends AppCompatActivity {
 
         if(ticketType.equalsIgnoreCase("guest list")){
             TextView notetv = (TextView) findViewById(R.id.note);
-            notetv.setText("Entry after 11PM club charges will apply");
+            notetv.setText("Entry after 10PM club charges will apply");
         }else if(ticketType.equalsIgnoreCase("table") ){
             ticketDetailstv.setText(ticketDetails+" With FULL COVER of "+costAfterDiscount+"Rs");
         }else if(ticketType.equalsIgnoreCase("pass") ){

@@ -51,12 +51,12 @@ public class ProfileScreenFragment extends Fragment {
 
         SharedPreferences settings = getActivity().getSharedPreferences(Constants.PREFS_NAME, 0);
         String custmerName = settings.getString("name","");
-        custmerMobile = settings.getString("mobile","");
+        //custmerMobile = settings.getString("mobile","");
 
         TextView cnametv = (TextView) getActivity().findViewById(R.id.user_profile_name);
         cnametv.setText(custmerName);
-        TextView mobiletv = (TextView) getActivity().findViewById(R.id.user_profile_mobile);
-        mobiletv.setText("+91 "+custmerMobile);
+//        TextView mobiletv = (TextView) getActivity().findViewById(R.id.user_profile_mobile);
+//        mobiletv.setText("+91 "+custmerMobile);
 
         TextView callustc = (TextView) getActivity().findViewById(R.id.call_us);
         TextView aboutusTv = (TextView) getActivity().findViewById(R.id.about_us);
@@ -74,7 +74,7 @@ public class ProfileScreenFragment extends Fragment {
             public void onClick(View arg0) {
 
                 Intent callIntent = new Intent(Intent.ACTION_CALL);
-                callIntent.setData(Uri.parse("tel:+91"+"9833097595"));
+                callIntent.setData(Uri.parse("tel:+91"+"9867614466"));
 
                 if (ContextCompat.checkSelfPermission(getActivity(),
                         Manifest.permission.CALL_PHONE)

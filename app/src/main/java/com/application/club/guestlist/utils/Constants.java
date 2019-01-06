@@ -48,6 +48,8 @@ public class Constants {
     public static String AVAILBLE_TICKETS = "availbletickets";
     public static String TABLE_SIZE = "size";
 
+    public static  String RESPONSE_FROM_PAYMENTGETWAY = "paymentgetwayResponse";
+
 
     // eventdetails ( clubid, clubname,djname, music, date, imageURL)
     //public static String CLUB_ID = "clubid";
@@ -65,6 +67,7 @@ public class Constants {
     public static String TICKET_DETAILS = "ticketDetails";
 
     public static String CUSTOMERID = "customerId";
+    public static String EMAIL = "email";
 
 
     public static String TOTAL_COST = "totalCost";
@@ -102,6 +105,8 @@ public class Constants {
     public static String IS_NOTIFICATION= "isNotification";
     public static String PASS_DISCOUNT= "passdiscount";
     public static String TABLE_DISCOUNT= "tablediscount";
+    public static String OFFERS_DETAILS = "offersDetails";
+
 
     public static String OFFERFORTABLE= "OfferForTable";
     public static String OFFERFORPASS= "offerForPass";
@@ -113,6 +118,8 @@ public class Constants {
     public static String TABLE_NUMBER = "tablenumber";
     public static String LAYOUT_URL = "layoutURL";
     public static String ISBOOKED = "booked";
+
+    public static String PAYMENT_FAILURE_MESSAGE = "If the payment gets debited from your account. The amount gets automatically refunded in 2-3 working days.";
 
 
 

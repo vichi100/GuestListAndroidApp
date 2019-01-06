@@ -10,6 +10,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.application.club.guestlist.R;
+import com.application.club.guestlist.utils.Constants;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.squareup.picasso.Picasso;
 
 public class CustomGridViewActivity extends BaseAdapter {
@@ -58,8 +61,15 @@ public class CustomGridViewActivity extends BaseAdapter {
 
 
 
-            Picasso.with(mContext).load(gridViewImageId[i])
-                    //.networkPolicy(NetworkPolicy.OFFLINE)
+//            Picasso.with(mContext).load(gridViewImageId[i])
+//                    //.networkPolicy(NetworkPolicy.OFFLINE)
+//                    .into(imageViewAndroid);
+            Glide.with(mContext)
+                    .load(gridViewImageId[i])
+                    //.placeholder(R.drawable.circular_progress_bar)
+                    //.apply(options)
+                    .diskCacheStrategy(DiskCacheStrategy.RESULT)
+                    //.skipMemoryCache(true)
                     .into(imageViewAndroid);
             //imageViewAndroid.setBackgroundColor(Color.GREEN);
         } else {

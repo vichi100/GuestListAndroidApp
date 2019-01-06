@@ -1,6 +1,7 @@
 package com.application.club.guestlist;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -10,17 +11,21 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import com.ashokvarma.bottomnavigation.BottomNavigationBar;
+import com.ashokvarma.bottomnavigation.BottomNavigationItem;
 import com.github.florent37.tutoshowcase.TutoShowcase;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import android.graphics.Color;
 import android.support.v7.app.ActionBar;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Toast;
 
@@ -35,6 +40,8 @@ import com.application.club.guestlist.menu.LocationChangeActivity;
 import com.application.club.guestlist.offer.OffersFragment;
 import com.application.club.guestlist.profile.ProfileScreenFragment;
 import com.application.club.guestlist.utils.Constants;
+
+//https://github.com/Ashok-Varma/BottomNavigation
 
 
 public class MainActivity extends AppCompatActivity implements AHBottomNavigation.OnTabSelectedListener{
@@ -54,10 +61,89 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
         //setSupportActionBar(toolbar);
 
 
-        bottomNavigation= (AHBottomNavigation) findViewById(R.id.myBottomNavigation_ID);
+//        bottomNavigation= (AHBottomNavigation) findViewById(R.id.myBottomNavigation_ID);
+//
+//        bottomNavigation.setOnTabSelectedListener(this);
+//        this.createNavItems();
 
-        bottomNavigation.setOnTabSelectedListener(this);
-        this.createNavItems();
+
+
+        //https://github.com/Ashok-Varma/BottomNavigation
+        BottomNavigationBar bottomNavigationBar = (BottomNavigationBar) findViewById(R.id.bottom_navigation_bar);
+
+        bottomNavigationBar
+                .setActiveColor( "#1c1d1d")
+                .setInActiveColor("#FFFFFF")
+                .setBarBackgroundColor("#ff0066");
+
+        bottomNavigationBar
+                .addItem(new BottomNavigationItem(R.drawable.pub, "Clubs"))
+                .addItem(new BottomNavigationItem(R.drawable.offer2, "Offers"))
+                .addItem(new BottomNavigationItem(R.drawable.ticket3, "Passes"))
+                .addItem(new BottomNavigationItem(R.drawable.guy, "Me"))
+                .initialise();
+        bottomNavigationBar.setFirstSelectedPosition(0);
+
+
+
+        SharedPreferences settings = getSharedPreferences(Constants.PREFS_NAME, 0);
+        String city = settings.getString(Constants.CITY,"");
+        ClubsListFragment clubsListFragment =new ClubsListFragment();
+        getSupportFragmentManager().beginTransaction().replace(R.id.content_id, clubsListFragment).commit();
+        updateToolbarText(city);
+
+
+        bottomNavigationBar.setTabSelectedListener(new BottomNavigationBar.OnTabSelectedListener(){
+            @Override
+            public void onTabSelected(int position) {
+
+                String title="";
+                if(position==0)
+                {
+                    SharedPreferences settings = getSharedPreferences(Constants.PREFS_NAME, 0);
+                    String city = settings.getString(Constants.CITY,"");
+                    ClubsListFragment clubsListFragment =new ClubsListFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.content_id, clubsListFragment).commit();
+                    title = city;
+                }
+                else if(position==1)
+                {
+
+                    OffersFragment offersScreenFragment =new OffersFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.content_id, offersScreenFragment).commit();
+
+                    title = "Offers";
+                }
+
+                else if(position==2)
+                {
+
+                    BookingFragment bookingFragment =new BookingFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.content_id, bookingFragment).commit();
+                    title = "Passes";
+                }
+
+
+                else if(position==3)
+                {
+
+                    ProfileScreenFragment profileScreenFragment =new ProfileScreenFragment();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.content_id, profileScreenFragment).commit();
+                    title = "Me";
+                }
+
+                updateToolbarText(title);
+
+
+            }
+            @Override
+            public void onTabUnselected(int position) {
+            }
+            @Override
+            public void onTabReselected(int position) {
+            }
+        });
+
 
         final Intent notificationIntent = new Intent(this, LocationChangeActivity.class);
 
@@ -68,6 +154,18 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
                 Object value = bundle.get(key);
                 Log.d(TAG, "Key: " + key + " Value: " + value.toString());
             }
+        }
+
+        final NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Create channel to show notifications.
+            String channelId  = getString(R.string.default_notification_channel_id);
+            String channelName = getString(R.string.default_notification_channel_id);
+            NotificationManager notificationManager =
+                    getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(new NotificationChannel(channelId,
+                    channelName, NotificationManager.IMPORTANCE_LOW));
         }
 
         FirebaseMessaging.getInstance().subscribeToTopic(Config.TOPIC_GLOBAL);
@@ -97,8 +195,7 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
                             0, notificationIntent,
                             PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_ONE_SHOT);
 
-                    NotificationManager nm = (NotificationManager) context
-                            .getSystemService(Context.NOTIFICATION_SERVICE);
+
 
                     Resources res = context.getResources();
                     NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
@@ -113,6 +210,15 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
                     Notification n = builder.getNotification();
 
                     n.defaults |= Notification.DEFAULT_ALL;
+//                    // Since android Oreo notification channel is needed.
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                        String channelId = context.getString(R.string.default_notification_channel_id);
+//                        NotificationChannel channel = new NotificationChannel(channelId,   "title", NotificationManager.IMPORTANCE_DEFAULT);
+//                        channel.setDescription("body");
+//                        nm.createNotificationChannel(channel);
+//                        builder.setChannelId(channelId);
+//                    }
+
                     nm.notify(0, n);
 
                     //Toast.makeText(getApplicationContext(), "Push notification: " + message, Toast.LENGTH_LONG).show();
@@ -271,7 +377,7 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
                 new IntentFilter(Config.PUSH_NOTIFICATION));
 
         // clear the notification area when the app is opened
-        NotificationUtils.clearNotifications(getApplicationContext());
+        //NotificationUtils.clearNotifications(getApplicationContext());
     }
 
     @Override
@@ -305,5 +411,15 @@ public class MainActivity extends AppCompatActivity implements AHBottomNavigatio
                // .delayed(399)
                // .animated(true)
                 .show();
+    }
+
+    public boolean onKeyDown(int keyCode, KeyEvent event)
+    {
+        if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0)
+        {
+            this.moveTaskToBack(true);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

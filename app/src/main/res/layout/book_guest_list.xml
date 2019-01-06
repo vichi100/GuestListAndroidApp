@@ -107,7 +107,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/md_white_1000"
                 android:buttonTint="@color/md_white_1000"
-                android:text="Only Girls, Max Three"
+                android:text="Only Girls, Max Two"
                 android:textSize="18sp" />
 
 

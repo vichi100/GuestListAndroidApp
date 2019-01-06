@@ -141,10 +141,10 @@ public class QRCodeActivity extends AppCompatActivity {
             if(selectedGuestType.equalsIgnoreCase("couple")){
                 entrytv.setText("One Couple is Allowed");
             }else if(selectedGuestType.equalsIgnoreCase("girls")){
-                entrytv.setText("Max Three Girls Allowed");
+                entrytv.setText("Max Two Girls Allowed");
             }
 
-            notetv.setText("Entry after 11PM club charges will apply");
+            notetv.setText("Entry after 10PM club charges will apply");
         }
 
         if(bookingType.equalsIgnoreCase("Table")){
