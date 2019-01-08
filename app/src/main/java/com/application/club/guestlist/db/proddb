@@ -1414,3 +1414,29 @@ update tablesdata set eventdate = '06/Jan/2018' where eventdate =  '30/Dec/2018'
 
 update ticketdetails set availbletickets = '5' where date = '04/Jan/2019' and type = 'guest list';
 update ticketdetails set availbletickets = '5' where date = '05/Jan/2019' and type = 'guest list';
+
+--------------------------
+
+
+update eventdetails set date = '08/Jan/2019' where date =  '01/Jan/2019';
+update eventdetails set date = '09/Jan/2019' where date =  '02/Jan/2019';
+update eventdetails set date = '10/Jan/2019' where date =  '03/Jan/2019';
+update eventdetails set date = '11/Jan/2019' where date =  '04/Jan/2019';
+update eventdetails set date = '12/Jan/2019' where date =  '05/Jan/2019';
+update eventdetails set date = '13/Jan/2019' where date =  '06/Jan/2019';
+
+
+update ticketdetails set date = '08/Jan/2019' where date =  '01/Jan/2019';
+update ticketdetails set date = '09/Jan/2019' where date =  '02/Jan/2019';
+update ticketdetails set date = '10/Jan/2019' where date =  '03/Jan/2019';
+update ticketdetails set date = '11/Jan/2019' where date =  '04/Jan/2019';
+update ticketdetails set date = '12/Jan/2019' where date =  '05/Jan/2019';
+update ticketdetails set date = '13/Jan/2019' where date =  '06/Jan/2019';
+
+
+update tablesdata set eventdate = '08/Jan/2019' where eventdate =  '01/Jan/2019';
+update tablesdata set eventdate = '09/Jan/2019' where eventdate =  '02/Jan/2019';
+update tablesdata set eventdate = '10/Jan/2019' where eventdate =  '03/Jan/2019';
+update tablesdata set eventdate = '11/Jan/2019' where eventdate =  '04/Jan/2019';
+update tablesdata set eventdate = '12/Jan/2019' where eventdate =  '05/Jan/2019';
+update tablesdata set eventdate = '13/Jan/2019' where eventdate =  '06/Jan/2019';

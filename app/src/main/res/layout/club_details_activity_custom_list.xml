@@ -20,22 +20,29 @@
         <!--android:src="@drawable/club" />-->
     <!--</LinearLayout>-->
 
-    <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:layout_below="@+id/lx"
-        android:layout_marginTop="45dp"
-        >
+    <!--<RelativeLayout-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="fill_parent"-->
+        <!--android:layout_below="@+id/lx"-->
+        <!--android:layout_marginTop="45dp"-->
+        <!--&gt;-->
 
-    <ListView
-        android:id="@+id/lvUsers"
+    <!--<ListView-->
+        <!--android:id="@+id/lvUsers"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:dividerHeight="0dp"-->
+        <!--android:divider="@null">-->
+
+    <!--</ListView>-->
+
+    <!--</RelativeLayout>-->
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:dividerHeight="0dp"
-        android:divider="@null">
-
-    </ListView>
-
-    </RelativeLayout>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="45dp"
+        android:scrollbars="vertical" />
 
 </RelativeLayout>

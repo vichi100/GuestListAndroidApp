@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -52,6 +54,8 @@ public class ClubDetailsListActivity extends AppCompatActivity implements EventL
 
 	private AlertDialog progressDialog;
 
+	private RecyclerView recyclerView;
+
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.club_details_activity_custom_list);
@@ -61,7 +65,12 @@ public class ClubDetailsListActivity extends AppCompatActivity implements EventL
 		progressDialog= new SpotsDialog.Builder().setContext(this).setTheme(R.style.Custom).build();
 
 
-		clubListv = (ListView)findViewById(R.id.lvUsers);
+		recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+		RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+		recyclerView.setLayoutManager(mLayoutManager);
+
+
+		//clubListv = (ListView)findViewById(R.id.lvUsers);
 		Intent intent = getIntent();
         clubName = intent.getStringExtra(Constants.CLUB_NAME);
         getSupportActionBar().setTitle(clubName);
@@ -286,15 +295,19 @@ public class ClubDetailsListActivity extends AppCompatActivity implements EventL
 			}
 
 			// Create the adapter to convert the array to views
-			ClubsDetailListAdapter adapter = new ClubsDetailListAdapter(ClubDetailsListActivity.this, clubEventDetailsItemList);
+//			ClubsDetailListAdapter adapter = new ClubsDetailListAdapter(ClubDetailsListActivity.this, clubEventDetailsItemList);
+
+
+			ClubsDetailListAdapterRecyclerView adapter = new ClubsDetailListAdapterRecyclerView(ClubDetailsListActivity.this, clubEventDetailsItemList);
 
 			adapter.setTicketDetailsListJsonArray(ticketDetailsListJsonArray);
 			adapter.setTableDetailsListJsonArray(tableDetailsListJsonArray);
 
 			Constants.setTicketDetailsItemList(ticketDetailsItemList);
 			// Attach the adapter to a ListView
-			ListView listView = (ListView) ClubDetailsListActivity.this.findViewById(R.id.lvUsers);
-			listView.setAdapter(adapter);
+//			ListView listView = (ListView) ClubDetailsListActivity.this.findViewById(R.id.lvUsers);
+//			listView.setAdapter(adapter);
+			recyclerView.setAdapter(adapter);
 
 
 		}

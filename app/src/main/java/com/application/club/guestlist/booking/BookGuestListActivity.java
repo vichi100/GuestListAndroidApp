@@ -95,7 +95,7 @@ public class BookGuestListActivity extends AppCompatActivity implements EventLis
 
         Glide.with(this)
                 .load(imgURL)
-                .placeholder(R.drawable.circular_progress_bar)
+                //.placeholder(R.drawable.circular_progress_bar)
                 //.apply(options)
                 .diskCacheStrategy(DiskCacheStrategy.RESULT)
                 //.skipMemoryCache(true)
